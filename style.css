@@ -41,7 +41,7 @@ a { color: var(--green); }
 .cta-panel {
   position: absolute;
   left: 50%;
-  bottom: 138px;
+  bottom: 150px;
   transform: translateX(-50%);
   z-index: 10;
   padding: 0;
@@ -64,16 +64,16 @@ a { color: var(--green); }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 360px;
-  padding: 20px 44px;
+  min-width: 335px;
+  padding: 20px 42px;
   border: 2px solid var(--green);
   border-radius: 999px;
   color: var(--green);
   text-decoration: none;
   text-transform: uppercase;
-  letter-spacing: .16em;
+  letter-spacing: .18em;
   font-weight: 900;
-  font-size: clamp(18px, 1.2vw, 22px);
+  font-size: clamp(18px, 1.15vw, 21px);
   background: rgba(2,12,5,.72);
   box-shadow:
     0 0 18px rgba(166,255,34,.22),
