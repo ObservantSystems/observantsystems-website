@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Observant Academy | OBD2 Vehicle Health Patterns</title>
+  <meta name="description" content="Learn how Observant Drive interprets Android OBD2 vehicle telemetry: battery crank dip, coolant thermostat regulation, fuel trims, MAF behavior, DTC context, stream continuity, and learned baselines."/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="index.html">Home</a>
+    <a href="features.html">Features</a>
+    <a href="academy.html">Academy</a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSee21K4Xjnl3LQs7YyedL5NtDFyA2ju5YV920NC5700zwqSGw/viewform?usp=header" target="_blank" rel="noopener">Early Access</a>
+  </nav>
+
+  <main>
+    <header class="page-hero">
+      <p class="kicker">Observant Academy</p>
+      <h1>Learn why your vehicle behaves the way it does.</h1>
+      <p>Observant Academy explains the relationships behind the observations. Learn what healthy behavior usually looks like, how systems interact over time, and why small changes can matter long before a warning light appears.</p>
+      <a class="button" href="https://docs.google.com/forms/d/e/1FAIpQLSee21K4Xjnl3LQs7YyedL5NtDFyA2ju5YV920NC5700zwqSGw/viewform?usp=header" target="_blank" rel="noopener">Join Early Access</a>
+    </header>
+
+    <section class="section">
+      <h2>Vehicle Health Fundamentals</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Battery Startup Health</h3>
+          <p>Every startup tells a story. Observant Drive watches the sequence from resting voltage to crank dip, crank duration, and charging rebound so a vehicle can build a useful electrical baseline over time.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Thermostat Regulation</h3>
+          <p>A healthy cooling system is not defined by one temperature. Warm-up behavior, thermostat opening, operating range, fan recovery, and airflow recovery all help describe how well the system regulates.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Fuel Trim Context</h3>
+          <p>Short-term fuel trim, long-term fuel trim, and total trim are the ECU's running corrections. Observant Drive watches where those corrections happen: idle, cruise, load, and boost can each point toward different patterns.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Airflow & Engine Demand</h3>
+          <p>Mass airflow, throttle position, engine load, boost, and vacuum help describe how the engine is breathing. Air behavior and fuel correction are related, but they are not the same observation.</p>
+        </div>
+        <div class="feature-card">
+          <h3>DTC Context</h3>
+          <p>Diagnostic trouble codes are saved into the vehicle timeline so they can be reviewed later, even after a code is cleared from the car. When a DTC is searched, Observant Drive can pass along vehicle year, make, model, and the code so outside search tools can provide richer context without pretending the app replaces that research.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Stream Continuity</h3>
+          <p>Wireless Bluetooth OBD2 adapters are not always perfect. Observant Drive watches live data freshness, reconnects quietly after quick drops, and speaks up when a longer interruption deserves attention.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Why Context Matters</h2>
+      <p>A single number rarely tells the whole story. A fuel trim correction at idle means something different than the same correction under cruise or boost. A low coolant temperature during warm-up means something different than poor regulation after the thermostat opens.</p>
+      <p>Observant Drive is built around this idea: a vehicle is not a list of sensors. It is a system of relationships unfolding over time.</p>
+    </section>
+
+    <section class="section">
+      <h2>From Values To Behavior</h2>
+      <div class="cards">
+        <article>
+          <h3>Observe</h3>
+          <p>Read live OBD2, GPS, battery, coolant, fuel, air, boost, and vehicle state data while preserving useful context such as vehicle profile, operating condition, and connection freshness.</p>
+        </article>
+        <article>
+          <h3>Interpret</h3>
+          <p>Turn raw values into plain-English observations: thermostat regulation, startup voltage behavior, fuel trim drift, airflow consistency, graph coherence, and learned baseline changes.</p>
+        </article>
+        <article>
+          <h3>Act</h3>
+          <p>Use the event log, saved DTC life log, and Academy explanations to decide what deserves attention now, what should be watched over time, and what may simply be normal behavior.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Healthy Systems Should Be Quiet</h2>
+      <p>Observant Drive is designed to reduce cognitive load while driving. When systems are behaving normally, the app can stay calm. When a pattern becomes sustained or meaningful, it can surface a clearer observation instead of flooding the driver with raw numbers.</p>
+      <p>That is why the app emphasizes semantic event logs, voice modes, quiet reconnection, learned baselines, and graph views such as Ideal, Live, and Lately. The goal is not more noise. The goal is better signal.</p>
+    </section>
+
+    <section class="section">
+      <h2>Graphs As Vehicle Memory</h2>
+      <p>Autofocus graphs and Ideal / Live / Lately views help show whether a subsystem is tracking its expected behavior or slowly drifting away from it. Instead of only watching a jumpy live trace, drivers can compare present behavior against smoother recent and ideal patterns.</p>
+      <p>That makes the graph more than a display. It becomes a way to see subsystem coherence, drift, and change in real time.</p>
+    </section>
+
+    <section class="section">
+      <h2>Built For Real Cars</h2>
+      <p>Observant Drive supports wireless Bluetooth OBD2 use across daily drivers, project cars, and multi-vehicle households. Vehicle profiles can preserve settings for different rides, whether one dongle is moved between vehicles or multiple adapters are used across a small fleet.</p>
+      <p>The app is being refined through real road testing, with practical features such as auto-connect on startup, persistent units and graph settings, configurable voice behavior, landscape mode, DTC scanning, and Garage Memory for learned vehicle baselines.</p>
+    </section>
+
+    <section class="section">
+      <div class="cta-strip">
+        <h2>Observe. Interpret. Act.</h2>
+        <p>Academy articles will grow alongside the app, turning real observations into plain-English explanations for battery, coolant, fuel, air, DTCs, stream continuity, and long-term vehicle health drift.</p>
+        <a class="button" href="features.html">Explore Features</a>
+      </div>
+    </section>
+
+    <footer>
+      <p>© 2026 Observant Systems LLC · <a href="mailto:observantsystems@gmail.com">observantsystems@gmail.com</a> · <a href="privacy.html">Privacy</a></p>
+    </footer>
+  </main>
+</body>
+</html>
