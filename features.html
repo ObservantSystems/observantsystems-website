@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Observant Drive Features | Android OBD2 Vehicle Health Monitor</title>
+  <meta name="description" content="Explore Observant Drive features for Android: wireless Bluetooth OBD2 telemetry, multi-vehicle profiles, battery crank dip, thermostat regulation, fuel trim monitoring, stream continuity, DTC lifelog, GPS, voice alerts, learned baselines, and semantic vehicle health."/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="index.html">Home</a>
+    <a href="features.html">Features</a>
+    <a href="academy.html">Academy</a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSee21K4Xjnl3LQs7YyedL5NtDFyA2ju5YV920NC5700zwqSGw/viewform?usp=header" target="_blank" rel="noopener">Early Access</a>
+  </nav>
+
+  <main>
+    <header class="page-hero">
+      <p class="kicker">Feature Reference</p>
+      <h1>Everything your dashboard does not explain.</h1>
+      <p>Observant Drive is an Android vehicle health companion for wireless Bluetooth OBD2 data, GPS context, learned baselines, and plain-English observations. It does not just show numbers. It watches how your vehicle behaves over time.</p>
+      <a class="button" href="https://docs.google.com/forms/d/e/1FAIpQLSee21K4Xjnl3LQs7YyedL5NtDFyA2ju5YV920NC5700zwqSGw/viewform?usp=header" target="_blank" rel="noopener">Join Early Access</a>
+    </header>
+
+    <section class="section">
+      <h2>Ambient Vehicle Intelligence</h2>
+      <p>Most dashboards report isolated values. Observant Drive groups related signals into behavior: air, fuel, cooling, and battery. The goal is simple: help drivers notice meaningful patterns, system drift, and early changes before they become expensive surprises.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Wireless Bluetooth OBD2</h3>
+          <p>Connect with supported Bluetooth OBD2 adapters to view live vehicle telemetry, including RPM, speed, coolant temperature, voltage, fuel trims, airflow, throttle, load, boost or vacuum, GPS, and diagnostic information where available.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Multi-Vehicle Profiles</h3>
+          <p>Manage a household, garage, or small fleet. Observant Drive supports custom vehicle profiles so settings, baselines, and preferences can follow the right vehicle whether you swap one dongle between rides or keep different adapters in different cars.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Automatic Connection</h3>
+          <p>Open the app and Observant Drive can attempt to reconnect to your saved Bluetooth OBD2 adapter automatically. Quick reconnects stay quiet; longer interruptions can be surfaced when they matter.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Stream Continuity</h3>
+          <p>Cheap dongles and real-world Bluetooth links can drop, stall, or repeat stale ECU data. Observant Drive watches live stream freshness so the instrument knows when data is current, paused, or recovering.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Health Motifs</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Battery Startup Signature</h3>
+          <p>Every startup tells a story. Observant Drive watches resting voltage → crank dip → crank duration → charging rebound, then compares new starts against previous behavior to help reveal electrical drift over time.</p>
+          <ul>
+            <li>Resting voltage awareness</li>
+            <li>Crank dip detection</li>
+            <li>Crank duration context</li>
+            <li>Charging and alternator rebound</li>
+            <li>Previous-start comparison</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <h3>Thermostat Regulation</h3>
+          <p>Coolant temperature is not just a number. Observant Drive watches warm-up, thermostat opening, operating range, fan recovery, airflow recovery, and learned regulation behavior.</p>
+          <ul>
+            <li>Warm-up tracking</li>
+            <li>Thermostat opening observation</li>
+            <li>Healthy operating temperature context</li>
+            <li>Fan and low-speed recovery</li>
+            <li>Baseline comparison after regulation is learned</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <h3>Fuel Trim Intelligence</h3>
+          <p>Fuel trims are the ECU's live corrections. Observant Drive watches short-term fuel trim, long-term fuel trim, and total trim across idle, cruise, load, and boost so corrections can be understood in context instead of as isolated numbers.</p>
+          <ul>
+            <li>STFT, LTFT, and total trim</li>
+            <li>Idle, cruise, load, and boost context</li>
+            <li>Sustained correction detection</li>
+            <li>Plain-English fuel observations</li>
+            <li>Useful context for vacuum leaks, MAF drift, fuel delivery, and adaptation patterns</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <h3>Airflow & Engine Demand</h3>
+          <p>Air is more than a MAF number. Observant Drive monitors airflow, throttle, engine load, boost or vacuum, and demand changes to help separate normal response from suspicious behavior.</p>
+          <ul>
+            <li>Mass airflow behavior</li>
+            <li>Throttle and load tracking</li>
+            <li>Boost/vacuum awareness</li>
+            <li>Airflow consistency observations</li>
+            <li>Cross-context with fuel correction behavior</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Graphing & Drift Awareness</h2>
+      <p>Observant Drive graphs are designed for behavior, not decoration. The app can compare live movement against recent and idealized patterns so subsystem coherence and drift are easier to see while driving.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Ideal / Live / Lately</h3>
+          <p>Graph modes help compare what is happening now, what has been happening lately, and what a healthy or learned pattern should look like. Ideal + Lately views can make slow drift easier to notice without live jitter.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Auto-Focus Graph</h3>
+          <p>Graph behavior can emphasize useful movement instead of forcing the driver to constantly rescale or interpret noisy values. The goal is readable telemetry with less cognitive load.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Constellation Views</h3>
+          <p>CRT, Health Ops, and Garage Memory skins present the same vehicle from different angles: live instrument, health operations, and learned baseline memory.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Max / Min Awareness</h3>
+          <p>Capture useful peaks, lows, and operating ranges so a drive can be understood after the moment has passed.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Diagnostics & Memory</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>DTC Scan Support</h3>
+          <p>Read diagnostic trouble codes when an OBD2 connection is available. Observant Drive can help frame a code search with vehicle context such as year, make, model, and DTC so the driver can use web and Google AI results without the app pretending to replace the wider diagnostic internet.</p>
+        </div>
+        <div class="feature-card">
+          <h3>DTC Lifelog</h3>
+          <p>Codes matter even after they are cleared from the vehicle. Observant Drive can preserve diagnostic events in the app history so you can search, review, and remember what happened later.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Semantic Event Log</h3>
+          <p>The event log is designed to capture meaning, not spam. It records milestones, sustained changes, system states, and observations in plain English.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Garage Memory</h3>
+          <p>Learned baselines help compare today's behavior against your own vehicle's history, not only generic thresholds. The more a vehicle is observed, the more useful its normal behavior becomes.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Driver Experience</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Quiet When Healthy</h3>
+          <p>A healthy car should not need constant attention. Observant Drive is built to protect your cognitive budget while driving and speak up when an observation is useful.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Voice Awareness</h3>
+          <p>Configurable voice modes can surface important observations while driving, including screen-off awareness for key events and quieter behavior when systems are stable.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Persistent Setup</h3>
+          <p>Vehicle profile, Bluetooth dongle, graph settings, skin, units, media bar, MPH display, voice level, sensitivity, color preferences, and other settings can persist across sessions.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Customization</h3>
+          <p>Choose visual skins, voice behavior, unit preferences, media display, graph behavior, and vehicle-specific setup so the app fits the way you actually drive.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Current Capability Catalog</h2>
+      <p>Observant Drive is under active development. The list below reflects capabilities available or actively being refined through real-world testing.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Vehicle & Connection</h3>
+          <ul>
+            <li>Android OBD2 vehicle health monitoring</li>
+            <li>Wireless Bluetooth OBD2 support</li>
+            <li>Automatic adapter reconnect</li>
+            <li>Multi-vehicle profile support</li>
+            <li>Saved dongle and vehicle settings</li>
+            <li>Stream continuity and stale ECU data detection</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h3>Subsystem Intelligence</h3>
+          <ul>
+            <li>Battery startup voltage motif</li>
+            <li>Coolant thermostat regulation monitoring</li>
+            <li>Fuel trim monitor with STFT, LTFT, and total trim</li>
+            <li>Airflow, MAF, throttle, load, and boost awareness</li>
+            <li>GPS telemetry context</li>
+            <li>Learned baselines and vehicle health drift awareness</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h3>Interface</h3>
+          <ul>
+            <li>CRT instrumentation skin</li>
+            <li>Health Ops skin</li>
+            <li>Garage Memory skin</li>
+            <li>Landscape driving mode</li>
+            <li>Ideal, Live, and Lately graph modes</li>
+            <li>Auto-focus graph behavior</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h3>Driver Tools</h3>
+          <ul>
+            <li>DTC scan and search context</li>
+            <li>DTC lifelog after codes are cleared</li>
+            <li>Semantic observations and event log</li>
+            <li>Voice notification modes</li>
+            <li>Quiet-when-healthy behavior</li>
+            <li>Persistent customization and sensitivity settings</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="cta-strip">
+        <h2>Built for people who listen to their cars.</h2>
+        <p>Join early access and help shape the first public release of Observant Drive for Android.</p>
+        <a class="button" href="https://docs.google.com/forms/d/e/1FAIpQLSee21K4Xjnl3LQs7YyedL5NtDFyA2ju5YV920NC5700zwqSGw/viewform?usp=header" target="_blank" rel="noopener">Join Early Access</a>
+      </div>
+    </section>
+
+    <footer>
+      <p>© 2026 Observant Systems LLC · <a href="mailto:observantsystems@gmail.com">observantsystems@gmail.com</a> · <a href="privacy.html">Privacy</a></p>
+    </footer>
+  </main>
+</body>
+</html>
