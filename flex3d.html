@@ -4,8 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>FLEX 3D Insider Lab | Observant Drive</title>
-<meta name="robots" content="noindex,nofollow"/>
+<title>FLEX v5.2.35 — Scientific Cleanliness Pass</title>
 <style>
   :root{
     --bg:#ffffff; --fg:#111; --muted:#666; --line:#e8e8e8; --card:#fafafa;
@@ -103,6 +102,13 @@
   .jumpFlash{background:#f3f7ff;border-color:#9bb4ff}
   .glWrap{position:relative;width:100%;}
   .glWrap canvas{display:block;}
+  #axisCompass{
+    position:absolute;left:9px;bottom:9px;width:78px;height:78px;
+    pointer-events:none;background:rgba(255,255,255,.82);border:1px solid rgba(0,0,0,.12);
+    border-radius:11px;box-shadow:0 2px 8px rgba(0,0,0,.07);z-index:4;
+    backdrop-filter:blur(4px);
+  }
+  body.flexCanvasDark #axisCompass{background:rgba(8,8,8,.76);border-color:rgba(255,255,255,.18);}
   #ghostCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.92;mix-blend-mode:multiply;display:none;background:transparent;}
   #ghostCanvas.crtGhost{mix-blend-mode:screen;opacity:.72;filter:contrast(1.35) saturate(1.6);}
   #ghostCanvas.edgeGhost{mix-blend-mode:multiply;opacity:.88;filter:contrast(1.6) grayscale(.2);}
@@ -142,66 +148,77 @@
   body.flexCanvasDark #viewerCard .small, body.flexCanvasDark #viewerCard .viewerHudNote{color:#bbb}
   .researchBanner{border:1px solid #dbe7ff;background:#f6f9ff;border-radius:14px;padding:10px 12px;margin:10px 0;color:#263b68}
   .researchBanner b{color:#111}
+  .platformFrame{border:1px solid #dce7f6;background:#f8fbff;border-radius:14px;padding:12px 14px;margin:10px 0 12px 0;color:#172235}
+  .platformFlow{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:8px}
+  .platformStep{border:1px solid #e7eef8;background:#fff;border-radius:10px;padding:8px 9px}
+  .platformStep b{display:block;color:#111;margin-bottom:3px}
+  .platformNote{margin-top:8px;color:#536178}
+  .lensPanelGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px}
+  .lensPanel{border:1px solid #e6e6e6;background:#fff;border-radius:12px;padding:10px}
+  .lensPanel h3{margin:0 0 6px 0;font-size:14px}
+  .lensMetricGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin-top:8px}
+  .lensMetric{border:1px solid #eee;border-radius:10px;padding:6px 7px;background:#fafafa}
+  .lensMetric b{display:block;font-size:11px;color:#666;font-weight:650}
+  .lensMetric span{font-family:var(--mono);font-size:12px;color:#111}
+  .lensScoreBar{height:8px;border:1px solid #e4e4e4;border-radius:999px;overflow:hidden;background:#eee;margin-top:4px}
+  .lensScoreBar>i{display:block;height:100%;background:#111;width:0%}
+  .lensTableWrap{max-height:300px;overflow:auto;border:1px solid #eee;border-radius:10px;background:#fff;margin-top:8px}
+  .lensQuestion{color:#555;margin-top:4px}
+
+  .buRoundFlag{display:inline-block;margin-left:6px;border:1px solid #d8d8d8;border-radius:999px;padding:1px 6px;background:#fff;font-family:var(--mono);font-size:10px;color:#333}
+  .buDuplicateNote{display:block;color:#777;font-size:11px;margin-top:2px}
+  .buNormGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:6px;margin-top:8px}
+  .buNormCell{border:1px solid #eee;background:#fafafa;border-radius:10px;padding:6px 7px}
+  .buNormCell b{display:block;font-size:11px;color:#666;font-weight:650}
+  .buNormCell span{font-family:var(--mono);font-size:12px;color:#111}
+  .buControls{border:1px solid #e8e8e8;background:#fff;border-radius:12px;padding:8px;margin-top:8px}
+  .buControls select{max-width:260px}
+  .buSelected{background:#f6fbff}
+  .buRecipe{border:1px solid #e9e9e9;background:#fcfcfc;border-radius:12px;padding:9px;margin-top:8px}
+  .buScoreExplain{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px;margin-top:8px}
+  .buScoreExplain div{border:1px solid #eee;border-radius:10px;background:#fff;padding:6px 7px}
   .fixedCenterHot{background:#eefaf2;border-color:#b8dfc4}
   .fixedCenterWarn{background:#fff8e8;border-color:#ead09a}
-  @media print{.flexTabBar,.dossierActions{display:none!important}.dossierViewer{max-height:none;overflow:visible;border:0;padding:0}.dossierViewer table{display:table;white-space:normal;overflow:visible}.dossierViewer .reportScroll{max-height:none;overflow:visible}.dossierViewer figure{break-inside:avoid}}
 
-  /* Observant Labs polish — lightweight wrapper only; does not change FLEX math or UI behavior */
-  .observantTopNav{
-    position:sticky;top:0;z-index:9998;margin:-18px -18px 14px -18px;
-    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-    padding:10px 18px;border-bottom:1px solid #dfeee0;background:rgba(250,255,250,.94);
-    backdrop-filter:blur(8px);box-shadow:0 6px 24px rgba(0,0,0,.045)
-  }
-  .observantBrand{font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#132313}
-  .observantLinks{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .observantLinks a{
-    display:inline-flex;align-items:center;justify-content:center;border:1px solid #cfe7cf;
-    border-radius:999px;padding:7px 10px;background:#fff;color:#142114;text-decoration:none;
-    text-transform:uppercase;letter-spacing:.10em;font-size:11px;font-weight:700
-  }
-  .observantLinks a:hover{background:#f0fff0;border-color:#8fd68f}
-  .labIntro{
-    border:1px solid #d8ead8;border-radius:14px;background:linear-gradient(135deg,#fbfffb,#f5fff5);
-    padding:12px 14px;margin:10px 0 12px 0;color:#172417
-  }
-  .labIntro b{color:#000}
-  .labIntro ul{margin:7px 0 0 18px;padding:0}
-  .labIntro li{margin:3px 0}
-  @media(max-width:850px){
-    .observantTopNav{position:static;margin:-18px -18px 12px -18px}
-    .observantLinks a{font-size:10px;padding:6px 8px}
-  }
+  /* v5.2.34 Living Spine calibration + physical Ring Field */
+  .homeNav{display:flex;justify-content:flex-end;align-items:center;margin:0 0 10px 0}
+  .homeNav a{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid #ddd;border-radius:999px;color:#111;text-decoration:none;background:#fff;font-size:12px;font-weight:650}
+  .homeNav a:hover{background:#f6f6f6}
+  .ringFieldLab{border:1px solid #dfe7f2;border-radius:12px;background:#fbfdff;padding:10px;margin-top:10px}
+  .ringMetric{display:inline-block;border:1px solid #d8e2ef;background:#fff;border-radius:999px;padding:3px 8px;margin:2px;font-family:var(--mono);font-size:11px}
+  .protocolAudit{border:1px solid #dfe7f2;background:#fbfdff;border-radius:12px;padding:9px 10px;margin-top:8px}
+  .protocolAudit b{color:#111}.advancedGrid{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+  @media print{.flexTabBar,.dossierActions{display:none!important}.dossierViewer{max-height:none;overflow:visible;border:0;padding:0}.dossierViewer table{display:table;white-space:normal;overflow:visible}.dossierViewer .reportScroll{max-height:none;overflow:visible}.dossierViewer figure{break-inside:avoid}}
 
 </style>
 </head>
 <body>
-<nav class="observantTopNav" aria-label="Observant Labs navigation">
-  <div class="observantBrand">Observant Labs · FLEX 3D</div>
-  <div class="observantLinks">
-    <a href="/">Observant Drive</a>
-    <a href="/features.html">Features</a>
-    <a href="/academy.html">Academy</a>
+<nav class="homeNav" aria-label="Observant Drive"><a href="https://observantdrive.com/">← ObservantDrive.com</a></nav>
+<h1>FLEX v5.2.35 — Geometric Measurement Platform</h1>
+<div class="small"><b>Measure first. Compare second. Interpret last.</b> FLEX builds a cross-sectional measurement record, then re-reads that same record through explicit geometric lenses. Raw measurements remain separate from fitted scaffolds, reciprocal tests, and optional reference libraries.</div>
+<div class="platformFrame small">
+  <b>Platform hierarchy.</b> FLEX distinguishes what was measured, what was derived, and what is being interpreted.
+  <div class="platformFlow">
+    <div class="platformStep"><b>Measurement Configuration</b> Slice method, axis, centroid mode, fit mode, calibration, and sampling choices.</div>
+    <div class="platformStep"><b>Measurement Engine</b> STL loading, slicing, center estimation, scaffold fitting, bands, XYZ, residuals, and analysis math.</div>
+    <div class="platformStep"><b>Measurement Record</b> Fixed arrays and summaries produced by the current configuration.</div>
+    <div class="platformStep"><b>Downstream Lenses</b> Coordinate systems, scaffold, reciprocal, grammar, sphere, meridian, helical, and Base Unit reads.</div>
+    <div class="platformStep"><b>Semantic Summary</b> Careful field-note language describing what appears, suggests, or remains consistent.</div>
+    <div class="platformStep"><b>Supporting Evidence</b> Tables, canvases, exports, and cross-lens consensus.</div>
   </div>
-</nav>
-<h1>FLEX 3D Insider Lab — Cross-Section Geometry Explorer</h1>
-<div class="labIntro small">
-  <b>Private experimental research tool.</b> FLEX 3D reads local geometry from an uploaded STL in your browser, slices the form along X, Y, or Z, and reports how those cross-sections behave through the object. It is built to help inspect shape relationships, drift, repeated states, spherical residuals, and cross-axis agreement without assuming one explanation in advance.
-  <ul>
-    <li><b>What is measured:</b> slice height, median radius/width, local spread, envelope shape, centroid behavior, band/state reuse, residual error, and X/Y/Z agreement.</li>
-    <li><b>What is reported:</b> structural bands, transitions, scaffold-fit lenses, sphere-reference residuals, reciprocal/mirror behavior, and shareable visual reports.</li>
-    <li><b>How to use it:</b> drop an STL, run Analyze All, inspect the 3D view, then compare Width vs Height, State / Band Progression, and Cross-axis Agreement.</li>
-  </ul>
+  <div class="platformNote">Changing measurement settings may create a new measurement record. Changing downstream lenses only re-reads the current record.</div>
 </div>
 <div class="small">
-Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no model upload, no cloud processing, and no internet connection required after the page loads. Scaffold-based views are included as exploratory lenses, not as proof of intent or a required interpretation.
+Drop one or many <span class="pill">.stl</span> files. Start with the <b>3D View</b>, then scroll to <b>State / band progression</b>, <b>Radius vs Height</b>, and <b>Cross-axis agreement</b>.
+Scaffold-based, reciprocal, coordinate-system, and Base Unit views are exploratory downstream lenses, not presumed answers or required interpretations.
+No internet, no uploads. All computation stays in your browser.
 </div>
 
 <details style="margin-top:10px">
-  <summary>Plain-English guide: what FLEX measures and what the confidence checks mean</summary>
-  <div class="small" style="margin-top:8px"><p><b>Loaf of bread.</b> FLEX slices bottom→top. Each slice measures “typical width.”</p>
+  <summary>ELI5: What are bands, scaffold tests, and the confidence checks?</summary>
+  <div class="small" style="margin-top:8px"><p><b>Loaf of bread.</b> FLEX slices bottom→top. Each slice measures “typical radial distance.”</p>
     <p><b>Bands</b> happen when many neighboring slices land on the same width “shelf.” That becomes a long bar in the band plot and a consistent color ring in 3D.</p>
-    <p><b>Scaffold test</b>: one neutral lens asks whether measured widths tend to sit near <b>repeatable candidate scaffold steps</b>. The reference scaffold step <code class="k">√6/2 ≈ 1.224745</code> is only a comparison corridor; you can also fit the scaffold step by grid search or use segmented scans. FLEX is not assuming a named pattern in advance.</p>
+    <p><b>Scaffold test.</b> An optional model asks whether measured radial distances can be summarized by repeated multiplicative steps. FLEX estimates the step from a disclosed search domain; no named constant is used as the default measurement reference.</p>
     <p><b>Stability Sweep</b>: jitter the knobs many times. If purity stays high and the <b>scaffold step</b> doesn’t drift, it’s “hard to shake.”</p>
     <p><b>Null Test</b>: keep big shape, scramble small wiggles. If nulls rarely beat real purity+fit, it’s less likely a mirage.</p>
     <p><b>Slice Engine</b>: intersects <b>triangles</b> with planes (not vertices), reducing mesh-density illusions.</p>
@@ -209,34 +226,34 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
 
     <p><b>Reciprocal traversal check.</b> FLEX now compares mirrored regions around the belly/widest point. It asks whether expansion on one side is balanced by contraction on the other side, using log-ratio closure where <code class="k">log(r_left)+log(r_right)≈0</code>. This is a structure-finding lens, not a proof of intent.</p>
 
-    <p><b>How to read “Width vs Height”.</b> The <b>black</b> line is the measured <b>median width</b> at each height slice. The <b>light gray</b> lines are the spread (10th–90th percentile) — think <i>handles / texture / local bumps</i>. The <b>green</b> marks are the <b>closest scaffold level</b> (<code class="k">scaffold spine</code>) under the active scaffold test.</p>
+    <p><b>How to read “Radius vs Height”.</b> The <b>black</b> line is the measured <b>median radial distance</b> at each height slice. The <b>light gray</b> lines are the spread (10th–90th percentile) — think <i>handles / texture / local bumps</i>. The <b>green</b> marks are the <b>closest scaffold level</b> (<code class="k">scaffold spine</code>) under the active scaffold test.</p>
     <p><b>A “band”</b> is not “FLEX painted stripes.” It’s a run of heights where the measured geometry remains close to the same candidate state under the active lens, so the snapped level <code class="k">scaffold spine = scale·step^state</code> stays stable. That can look cylindrical if the real shape is cylindrical, but it can also happen on tapered or curved regions: the black line can drift within the gray spread while still repeatedly returning to a nearby shelf.</p>
 
   </div>
 </details>
 
 <details style="margin-top:10px">
-  <summary>Quick start: first 5 minutes with FLEX 3D</summary>
+  <summary>Quick start: how to use this viewer</summary>
   <div class="small" style="margin-top:8px">
     <p><b>1.</b> Load one or more STL files, then click <b>Analyze All</b>.</p>
     <p><b>2.</b> Start with the <b>3D View</b>. Use it to see broad coherence, drift, texture, and transitions on the surface.</p>
-    <p><b>3.</b> Scroll to <b>State / band progression</b> and <b>Width vs Height</b> for the fastest structural read.</p>
+    <p><b>3.</b> Scroll to <b>State / band progression</b> and <b>Radius vs Height</b> for the fastest structural read.</p>
     <p><b>4.</b> Use <b>Cross-axis agreement</b> when you want to compare how the object behaves across X, Y, and Z rather than assuming one privileged orientation.</p>
     <p><b>5.</b> Treat scaffold-based views as one lens among several. They can be revealing, but they are not the only thing FLEX is looking for.</p>
   </div>
 </details>
 
 <details style="margin-top:10px">
-  <summary>What each main view reports</summary>
+  <summary>What each main view is showing</summary>
   <div class="small" style="margin-top:8px">
     <p><b>3D View:</b> surface coloring for state reuse, texture strength, or cross-axis convergence.</p>
     <p><b>State / band progression:</b> where slice states persist, switch, or cluster with height.</p>
-    <p><b>Width vs Height:</b> measured envelope versus the nearest active scaffold level.</p>
-    <p><b>Rule view (log-transformed):</b> a transformed lens that makes candidate repeated spacing easier to inspect without treating it as proven in advance.</p>
+    <p><b>Radius vs Height:</b> measured envelope versus the nearest active scaffold level.</p>
+    <p><b>Rule view (log-transformed):</b> a transformed lens that makes candidate repeated spacing easier to inspect without treating it as settled in advance.</p>
     <p><b>Fit error by height:</b> where scaffold behavior matches cleanly and where it breaks down.</p>
     <p><b>Scaffold state by height:</b> whether a scaffold state stays stable, jumps, or reappears in separated regions.</p>
     <p><b>Cross-axis agreement:</b> where X, Y, and Z produce compatible signals, where they differ, and where transitions may align across orientations.</p>
-    <p><b>Scaffold deviation overlay:</b> how measured width departs from the active scaffold after landmark normalization.</p>
+    <p><b>Scaffold deviation overlay:</b> how measured radius departs from the active scaffold after landmark normalization.</p>
     <p><b>Meridian sweep:</b> angle-specific behavior, useful when lugs, handles, or asymmetry matter.</p>
   </div>
 </details>
@@ -342,48 +359,50 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
 
       <span class="small" style="margin-left:10px"><b>Default</b>:</span>
       <label class="small"><input id="defaultSlice" type="checkbox"/> start in Slice Engine</label>
+      <label class="small" title="Compute the same active measurement protocol across X, Y, and Z for cross-axis comparison."><input id="xyzCoherence" type="checkbox" disabled/> cross-axis agreement (X/Y/Z)</label>
     </div>
 
     <div class="miniRow">
-      <span class="small"><b>Analysis mode</b>:</span>
-      <select id="fitMode" disabled>
-        <option value="fixed">Reference corridor test (√6/2)</option>
-        <option value="fit">Best-fit scaffold test</option>
-        <option value="piecewise">Segmented scaffold scan</option>
+      <span class="small"><b>Model lens</b>:</span>
+      <select id="fitMode" disabled title="Optional model applied after the radial measurement record is built.">
+        <option value="fit" selected>Global step fit — bounded search</option>
+        <option value="piecewise">Segmented step fit — exploratory</option>
       </select>
-
-      <span class="small">step range:</span>
-      <input id="kMin" type="number" step="0.001" value="1.120" style="width:92px" disabled/>
-      <input id="kMax" type="number" step="0.001" value="1.320" style="width:92px" disabled/>
+      <span class="small">The measurement record is built first; this selector changes only the downstream scaffold model.</span>
       <span class="small">Perf:</span>
-      <select id="perfMode" class="small" title="Speed runs fewer UI yields (faster but riskier on huge meshes). Stability yields more often to reduce 'wait/kill' prompts and WebGL resets.">
+      <select id="perfMode" class="small" title="Speed runs fewer UI yields. Stability yields more often to reduce browser stalls.">
         <option value="stability">Stability / safer</option>
         <option value="speed" selected>Speed / faster</option>
       </select>
-      <span class="small">Math speed:</span>
-      <select id="mathSpeedMode" class="small" title="Non-destructive sampling profile. Full preserves current sampling. Preview/Turbo reduce slice/vertex sampling for faster scouts and XYZ, without changing the math kernel.">
+      <span class="small">Sampling:</span>
+      <select id="mathSpeedMode" class="small" title="Sampling profile only. Preview and Turbo reduce samples; they do not alter formulas.">
         <option value="full">Full fidelity</option>
         <option value="preview">Preview fast</option>
-        <option value="turbo" selected>Turbo XYZ / vertex hack</option>
+        <option value="turbo" selected>Turbo scout</option>
       </select>
-      <label class="small" title="When XYZ is enabled, reuse the active-axis result if it is already one of Z/X/Y so cross-axis only computes the missing axes."><input id="xyzReuseActive" type="checkbox" checked/> reuse active axis for XYZ</label>
-
-      <input id="kStep" type="number" step="0.0001" value="0.0015" style="width:92px" disabled/>
-    
-    <div class="miniRow" id="piecewiseRow" style="display:none">
-      <span class="small"><b>Segmented scaffold controls</b>:</span>
-      <span class="small">segmentation penalty</span>
-      <input id="bandPenalty" type="number" step="0.001" value="0.020" style="width:92px" disabled/>
-      <span class="small">minimum segment length</span>
-      <input id="minBandSlices" type="number" min="6" max="300" value="18" style="width:92px" disabled/>
-      <span class="small">maximum segments</span>
-      <input id="maxBands" type="number" min="2" max="2000" value="200" style="width:92px" disabled/>
-      <label class="small" title="Compute X/Y/Z agreement (adds extra analyses).">
-        <input id="xyzCoherence" type="checkbox" disabled/> cross-axis agreement (X/Y/Z)
-      </label>
-      <span class="small" title="Penalty must be paid by improved fit. Increase penalty to reduce over-segmentation.">ⓘ</span>
+      <label class="small" title="Reuse the active-axis result when cross-axis analysis is enabled."><input id="xyzReuseActive" type="checkbox" checked/> reuse active axis for XYZ</label>
     </div>
-</div>
+
+    <details style="margin-top:10px">
+      <summary>Advanced model domain + complexity controls</summary>
+      <div class="small" style="margin-top:6px">The fitted step is discovered only inside this declared domain. Changing the domain can change the result; exports record it. Segmented mode adds local fits and therefore requires stronger stability checks.</div>
+      <div class="advancedGrid">
+        <span class="small"><b>Step search domain</b></span>
+        <label class="small">min <input id="kMin" type="number" step="0.001" value="1.050" style="width:92px" disabled/></label>
+        <label class="small">max <input id="kMax" type="number" step="0.001" value="2.000" style="width:92px" disabled/></label>
+        <label class="small">increment <input id="kStep" type="number" step="0.0001" value="0.0020" style="width:92px" disabled/></label>
+      </div>
+      <div class="miniRow" id="piecewiseRow" style="display:none">
+        <span class="small"><b>Segmented model</b>:</span>
+        <label class="small">complexity penalty <input id="bandPenalty" type="number" step="0.001" value="0.020" style="width:92px" disabled/></label>
+        <label class="small">minimum segment slices <input id="minBandSlices" type="number" min="6" max="300" value="18" style="width:92px" disabled/></label>
+        <label class="small">maximum segments <input id="maxBands" type="number" min="2" max="2000" value="200" style="width:92px" disabled/></label>
+      </div>
+    </details>
+
+    <div id="protocolAudit" class="protocolAudit small">
+      <b>Protocol:</b> radial percentiles → optional bounded scaffold fit → downstream reciprocal / reference comparisons. Search domain and sampling settings are part of the result, not hidden assumptions.
+    </div>
 
     <div class="miniRow">
       <button id="stabilitySweep" disabled>Stability Sweep</button>
@@ -403,7 +422,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
 
     <details style="margin-top:10px">
       <summary>Advanced search / guardrails</summary>
-      <div class="small" style="margin-top:6px">Use these when you want to scout candidate scaffold spacing, compare a reference scaffold to a best-fit scaffold, or flag trivial/degenerate solutions.</div>
+      <div class="small" style="margin-top:6px">Use these to inspect search-domain sensitivity and flag trivial or degenerate solutions. Candidate spacing is estimated from the object inside the declared domain.</div>
       <div class="card" style="margin-top:10px;padding:10px">
       <div class="miniRow" style="align-items:center;gap:10px;flex-wrap:wrap">
         <b class="small">Scout / guardrails</b>
@@ -417,7 +436,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
         <input id="scoutMax" type="number" step="0.01" value="2.50" style="width:88px" disabled/>
         <input id="scoutStep" type="number" step="0.001" value="0.005" style="width:88px" disabled/>
         <button id="scoutBtn" disabled>Scout (top 8)</button>
-        <button id="showdownBtn" disabled>Showdown (reference √6/2 vs best-fit)</button>
+        <button id="showdownBtn" disabled>Search-domain audit</button>
       </div>
       <div class="small tight" id="guardOut" style="margin-top:6px"></div>
       <div class="small tight" id="scoutOut" style="margin-top:6px"></div>
@@ -463,7 +482,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
         <option value="in">inches</option>
       </select>
       <label class="small"><input id="showRealUnits" type="checkbox" checked/> show real units</label>
-      <span class="small" id="realScaleInfo">Optional: enter object height to derive real widths, spans, and deltas.</span>
+      <span class="small" id="realScaleInfo">Optional: enter object height to derive real radii, spans, and deltas.</span>
     </div>
 
     <div class="small tight">
@@ -476,7 +495,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
 
   <div class="card" id="viewerCard">
     <div class="rightHeader">
-      <div class="small"><b>3D View</b> (rotate + zoom) — color shows the active measurement lens on the surface</div>
+      <div class="small"><b>3D View</b> (rotate + zoom) — color shows “bands” on the surface</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <button id="fullscreen3D" disabled>Fullscreen 3D</button>
         <span class="museumCtl" title="Downstream viewer-only rotation. Does not change analysis, slicing, fitting, or math.">
@@ -511,7 +530,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
         <button id="resetView" disabled>Reset View</button>
       </div>
     </div>
-    <div class="glWrap"><canvas id="glCanvas" style="height:360px" width="1000" height="360"></canvas><canvas id="ghostCanvas" width="1000" height="360"></canvas></div>
+    <div class="glWrap"><canvas id="glCanvas" style="height:360px" width="1000" height="360"></canvas><canvas id="ghostCanvas" width="1000" height="360"></canvas><canvas id="axisCompass" width="208" height="208" aria-label="Rotating XYZ orientation compass"></canvas></div>
     <div class="sliderRow">
       <label class="small"><b>Slice height</b> (bottom→top): <span id="sliceLabel">—</span></label>
       <input id="sliceZ" type="range" min="0" max="1000" value="0" disabled/>
@@ -545,6 +564,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
         <option value="mesh">Solid mesh (triangles)</option>
         <option value="scaffold">Scaffold rings (mean radius silhouette)</option>
       </select>
+      <label class="small" title="Viewer-only orientation guide; does not affect analysis."><input id="showAxisCompass" type="checkbox" checked/> XYZ compass</label>
       <label class="small" style="display:flex;align-items:center;gap:6px">
         <input type="checkbox" id="centerLock" disabled/>
         <span><b>Fixed Center Lens</b></span>
@@ -572,7 +592,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
     <div class="small"><b>State / band progression</b> (discrete state levels vs <b>height</b>)</div>
     <canvas id="bandCanvas" width="1000" height="320"></canvas>
     <div class="small" style="margin-top:8px">
-      Read: long solid bars mean neighboring slices are staying in the same measured state. Dense speckles mark busy, noisy, or transitional zones.
+      ELI5: long solid bars = the object stays in the same slice state for a while. Dense speckles = busy or transitional zones.
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">
       <button id="exportBands" disabled>Export Bands PNG</button>
@@ -580,13 +600,13 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
   </div>
 
   <div class="card soft">
-    <div class="small"><b>Width vs Height</b> (r(z) envelope + snapped levels)</div>
+    <div class="small"><b>Radius vs Height</b> (r(z) envelope + snapped levels)</div>
     <canvas id="rzCanvas" width="1000" height="320"></canvas>
     <div class="small" style="margin-top:8px">
-      Black = measured median width/radius at each height. Green dots = nearest candidate scaffold level under the active lens. Gray envelope = local spread, handles, surface texture, or asymmetry (10th–90th percentile).
+      Black = measured median radial distance at each height. Green dots = nearest candidate scaffold level under the active test. Dotted range = texture/handles/spread (90th−10th percentile).
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">
-      <button id="exportRZ" disabled>Export Width-Height PNG</button>
+      <button id="exportRZ" disabled>Export Radius-Height PNG</button>
     </div>
   </div>
 </div>
@@ -596,7 +616,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
     <div class="small"><b>Rule view (log-transformed)</b> (a straightened scaffold view)</div>
     <canvas id="logCanvas" width="1000" height="320"></canvas>
     <div class="small" style="margin-top:8px">
-      Read: if repeatable spacing is present under the active lens, the transformed black line tends to settle near flatter step-like levels.
+      ELI5: if repeating scaffold spacing is present, the black line hugs flatter step-like levels after a constant shift.
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">
       
@@ -611,10 +631,62 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
     <div class="small"><b>Fit error by height</b> (where the scaffold view fits vs struggles)</div>
     <canvas id="residCanvas" width="1000" height="320"></canvas>
     <div class="small" style="margin-top:8px">
-      Read: calm areas mean the active lens is close to the measured envelope. Spikes mark transitions, handles, sharp features, heavy surface texture, or regions where this lens may not be the right description.
+      ELI5: calm areas = the active scaffold lens is close to the measured envelope. Spikes = transitions, heavy decoration, handles, sharp features, or places where this lens is not the right description.
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">
       <button id="exportResid" disabled>Export Residual PNG</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="row flex-section" data-flex-section="numbers" style="margin-top:14px">
+  <div class="card soft" style="min-width:100%">
+    <div class="rightHeader">
+      <div>
+        <div class="small"><b>Downstream Measurement Platform</b> — coordinate systems, Base Units, and cross-lens consensus</div>
+        <div class="small lensQuestion">Question: when the same measurement record is re-read through independent frameworks, which observations remain stable?</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <label class="small"><b>Coordinate system</b>:</label>
+        <select id="coordinateLensSelect" disabled>
+          <option value="local">Local Slice Center (raw)</option>
+          <option value="floating">Floating Spine (smoothed local centroid)</option>
+          <option value="axisRef">Straight Axis / Lathe Reference</option>
+          <option value="fixed">Global Reference Center</option>
+          <option value="sphere">Sphere Reference</option>
+          <option value="scaffoldRef">Scaffold / Envelope Reference</option>
+          <option value="belly">Belly-Aligned</option>
+          <option value="neck">Neck-Aligned</option>
+          <option value="landmark">Landmark-Aligned</option>
+          <option value="baseUnit">Base Unit Normalized</option>
+          <option value="user">User Defined</option>
+        </select>
+        <label class="small"><b>BU reference</b>:</label>
+        <select id="activeBUSelect" disabled title="Choose which candidate Base Unit is used for the normalized landmark read. Auto uses the highest-scoring candidate.">
+          <option value="auto">Auto: top suggested</option>
+        </select>
+        <label class="small"><b>Manual BU</b>:</label>
+        <input id="manualBUInput" type="number" min="0" step="0.0001" placeholder="optional" style="width:110px" disabled/>
+        <button id="refreshPlatformLens" disabled>Refresh Lens Report</button>
+      </div>
+    </div>
+    <div class="small" style="margin-top:8px">
+      These panels do not alter STL loading, slicing, centroid estimation, fitting, bands, XYZ, reciprocal analysis, or exports. They compare downstream readings of the active measurement record and use cautious field-note wording. Use the <b>BU reference</b> selector to try different intrinsic units and watch whether landmarks collapse into simple ratios or become messy.
+    </div>
+    <div class="lensPanelGrid">
+      <div class="lensPanel">
+        <h3>Coordinate System Lens</h3>
+        <div class="small" id="coordinateLensOut">Analyze an STL to summarize coordinate-system choices.</div>
+      </div>
+      <div class="lensPanel">
+        <h3>Base Unit Explorer</h3>
+        <div class="small" id="baseUnitExplorerOut">Analyze an STL to rank candidate Base Units.</div>
+      </div>
+      <div class="lensPanel">
+        <h3>Cross-Lens Consensus</h3>
+        <div class="small" id="crossLensConsensusOut">Analyze an STL to compare independent downstream lenses.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -625,7 +697,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
     <div class="small"><b>Scaffold state by height</b> (scaffold step states vs height; steps = reused states)</div>
     <canvas id="kCanvas" width="1000" height="320"></canvas>
     <div class="small" style="margin-top:8px">
-      Read: flat plateaus mean a stable candidate state. Repeated plateaus suggest a similar measured condition reappears in separated regions.
+      ELI5: flat plateaus mean a stable candidate state. Repeated plateaus suggest a similar measured condition reappears across separated regions.
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">
       <button id="exportK" disabled>Export scaffold states PNG</button>
@@ -645,11 +717,11 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
 
 <div class="row" style="margin-top:14px">
   <div class="card" style="max-height:360px;overflow:auto">
-    <div class="small"><b>Detected bands</b> (continuous runs of the same measured state)</div>
+    <div class="small"><b>Detected bands</b> (runs of the same state)</div>
     <table id="bandsTbl">
       <thead>
         <tr>
-          <th>#</th><th>Height start</th><th>Height end</th><th>Span</th><th>State</th><th>Snapped width</th><th>Raw median width</th><th>Snap ratio → next</th><th>Raw ratio → next</th><th>Raw−Snap ratio Δ</th><th>Snap dir</th><th>Raw dir</th><th>Recip product</th><th>Mirror pair</th><th>Median |Δwidth|</th>
+          <th>#</th><th>Height start</th><th>Height end</th><th>Span</th><th>State</th><th>Snapped radius</th><th>Raw median radial distance</th><th>Snap ratio → next</th><th>Raw ratio → next</th><th>Raw−Snap ratio Δ</th><th>Snap dir</th><th>Raw dir</th><th>Recip product</th><th>Mirror pair</th><th>Median |Δwidth|</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -670,7 +742,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
   </div>
 
   <div class="card">
-    <div class="small"><b>Constellation Compare</b> (compare multiple STL files at once)</div>
+    <div class="small"><b>Constellation Compare</b> (all files at once)</div>
         <div class="miniRow" style="margin-top:6px">
       <span class="small"><b>Align</b>:</span>
       <select id="alignMode" disabled>
@@ -687,7 +759,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
     </div>
 <canvas id="compareCanvas" width="1000" height="360"></canvas>
     <div class="small" style="margin-top:8px">
-      Overlay of <b>median width vs height</b> (normalized). If shapes share structural similarity under the chosen alignment, curves align more tightly.
+      Overlay of <b>median radial distance vs height</b> (normalized). If shapes share structural similarity under the chosen alignment, curves align more tightly.
     </div>
   </div>
 </div>
@@ -698,7 +770,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
     <div class="small"><b>Scaffold deviation overlay</b> — deviation from scaffold after landmark normalization</div>
     <canvas id="moneyCanvas" width="1000" height="360"></canvas>
     <div class="small" style="margin-top:8px">
-      ELI5: each line shows how far the measured width is above/below the snapped scaffold at each height, after we warp heights so landmarks line up across objects.
+      ELI5: each line shows how far the measured radius is above/below the snapped scaffold at each height, after we warp heights so landmarks line up across objects.
       If multiple objects share a related scaffold or structural rhythm, their deviation signatures can rhyme even when textures differ.
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">
@@ -718,8 +790,9 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
           <option value="scaffold">Scaffold only (snapped r̂)</option>
           <option value="envelope">Envelope only (r10–r90)</option>
           <option value="both" selected>Scaffold + Envelope</option>
-          <option value="hologram">XYZ Scaffold Hologram / Volumetric Puzzle Field</option>
-          <option value="halfsphere">XYZ Half-Sphere Lock Lens</option>
+          <option value="centroidTrajectory">Centroid Trajectory Lens — Living XYZ Spine</option>
+          <option value="centerPreference">Center Preference Lens — Point vs Axis vs Curving Spine</option>
+          <option value="spineDiagnostics">Spine Diagnostics — drift, bend, tortuosity</option>
           <option value="reciprocal">Reciprocal traversal map (belly-outward)</option>
           <option value="bellyseed">Belly-Seed Phase Echo Lens</option>
           <option value="sphereRef">Sphere Reference Lens (fixed/local center)</option>
@@ -735,7 +808,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
     </div>
     <canvas id="scaffoldCanvas" width="1000" height="360"></canvas>
     <div class="small" style="margin-top:8px">
-      ELI5: <b>Scaffold</b> = the snapped candidate-width spine (<code class="k">scaffold spine</code>). <b>Envelope</b> = spread (<code class="k">r10–r90</code>) showing texture/handles/oscillation around the measured median. <b>XYZ Scaffold Hologram</b> appears after cross-axis agreement is enabled and projects X/Y/Z scaffold spines, centroid sweeps, and bounded envelopes into one shared interpretive field. <b>Half-Sphere Lock Lens</b> compresses X/Y/Z into three faithful orthogonal 180° arcs and highlights where apexes, stable regimes, or transition boundaries co-lock. <b>Sphere Reference</b> subtracts the fitted half-sphere cross-section so true spheres go quiet; use the Fixed Center checkbox to compare one global center against local slice-centering.
+      ELI5: <b>Scaffold</b> = the snapped candidate-radius spine (<code class="k">scaffold spine</code>). <b>Envelope</b> = spread (<code class="k">r10–r90</code>) showing texture/handles/oscillation around the measured median. <b>Centroid Trajectory</b> follows the estimated local center through each X/Y/Z slice family: a sphere should collapse toward a point, a cylinder toward a straight axis, and an egg, shell, face, or vessel may reveal a smooth migrating spine. <b>Center Preference</b> compares how economically the same measurement record is described by one center, one straight axis, or a curving local-centroid spine. <b>Sphere Reference</b> subtracts the fitted half-sphere cross-section so true spheres go quiet; use the Fixed Center checkbox to compare one global center against local slice-centering.
     </div>
   </div>
 
@@ -791,6 +864,9 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
         <button class="soundBtn" data-soundpreset="radioFast">Radio fast scan</button>
         <button class="soundBtn" data-soundpreset="driftNeedle">Drift needle</button>
         <button class="soundBtn" data-soundpreset="edgeNeedle">Edge chatter</button>
+        <button class="soundBtn" data-soundpreset="cfOrbit">Ring Field orbit</button>
+        <button class="soundBtn" data-soundpreset="cfChords">Ring Field chords</button>
+        <button class="soundBtn" data-soundpreset="cfRidge">Ring Field ridge</button>
       </div>
     </div>
 
@@ -803,6 +879,9 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
         <option value="xyz">XYZ Chords / triple echo</option>
         <option value="closures">Closure Bells / grammar-only</option>
         <option value="helical">Helical / Hilo Needle traversal</option>
+        <option value="cfOrbit">Angular Radial Field / ring orbit</option>
+        <option value="cfChords">Angular Radial Field / quadrant chords</option>
+        <option value="cfRidge">Angular Radial Field / ridge path</option>
       </select>
       <label class="small"><b>Base</b>:</label>
       <select id="musicBase" disabled>
@@ -886,6 +965,13 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
       <label class="small"><input id="musicAmpByDeviation" type="checkbox" disabled/> amplitude by deviation</label>
     </div>
 
+    <div class="miniRow" id="cfMusicQuickRow">
+      <span class="small"><b>Angular Radial Field music</b>:</span>
+      <span class="small">uses the current Ring Field center, signal, seam, alignment, bins, smoothing, and normalization settings.</span>
+      <label class="small"><b>Density</b> <select id="cfMusicDensity" disabled><option value="light">light</option><option value="normal" selected>normal</option><option value="dense">dense</option></select></label>
+      <label class="small"><input id="cfMusicAngleTone" type="checkbox" checked disabled/> angle shapes pitch</label>
+    </div>
+
     <div class="miniRow">
       <label class="small"><b>Manual phase scrub</b>: <span id="musicScrubLabel">0.500</span></label>
       <input id="musicScrub" type="range" min="0" max="1000" value="500" disabled/>
@@ -894,7 +980,7 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
     </div>
 
     <div class="small" style="margin-top:8px">
-      <b>ELI5:</b> ratios become pitch shifts around a base tone. Direction and loop controls test whether traversal order matters. Reciprocal pairs can beat, alternate, or crossfade. XYZ closures/echoes unlock after cross-axis agreement has been computed; closure bells mark moments where X×Y×Z returns near 1.
+      <b>ELI5:</b> ratios and radial-field departures become pitch shifts around a base tone. Direction and loop controls test whether traversal order matters. Ring Field modes let you hear complete circumferences, four-quadrant balance, or the strongest traveling ridge without leaving the Music tab. XYZ closures/echoes unlock after cross-axis agreement has been computed.
     </div>
     <div id="musicStatus" class="small mono" style="margin-top:8px;min-height:62px;border:1px solid #eee;border-radius:10px;background:#fff;padding:8px">No active sound yet.</div>
 
@@ -927,9 +1013,40 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
   </div>
 </div>
 
+<div class="row flex-section" data-flex-section="experimental" style="margin-top:14px">
+  <div class="card soft" style="min-width:100%">
+    <div class="ringFieldLab">
+      <div class="rightHeader">
+        <div>
+          <div class="small"><b>Ring Field — Angular Radial Unwrap</b></div>
+          <div class="small">Bins each slice by angle around the selected center and stacks the radial signal base→top. Angular ordering is reliable for star-shaped sections; concavities, holes, and multiple loops require caution.</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button id="exportRingFieldPNG" disabled>Export Ring Field PNG</button>
+          <button id="exportRingFieldCSV" disabled>Export Ring Field CSV</button>
+        </div>
+      </div>
+      <div class="miniRow">
+        <label class="small"><b>View</b> <select id="ringFieldView" disabled><option value="heatmap" selected>angular heatmap (0–360° equal width)</option><option value="traces">angular stacked traces</option><option value="ridges">angular ridge tracker</option><option value="physicalHeatmap">angular-order polyline heatmap</option><option value="physicalTraces">angular-order polyline traces</option><option value="split">split: angular + polyline length</option></select></label>
+        <label class="small"><b>Center / reference</b> <select id="ringFieldCenter" disabled><option value="localRaw">local slice centroid (raw)</option><option value="local" selected>floating spine (smoothed centroid)</option><option value="straightAxis">best straight centroid axis / lathe line</option><option value="global">single global reference center</option><option value="axis">world active-axis origin</option></select></label>
+        <label class="small"><b>Signal</b> <select id="ringFieldSignal" disabled><option value="mean" selected>deviation from slice mean</option><option value="median">deviation from slice median</option><option value="circleResidual">fitted-circle radial residual</option><option value="percent">percent from slice mean</option><option value="standard">standardized deviation (z-score)</option><option value="radius">raw radius</option></select></label>
+        <label class="small"><b>Alignment</b> <select id="ringFieldAlign" disabled><option value="manual" selected>manual/world seam</option><option value="ridge">align strongest outward ridge</option><option value="propagate">propagate seam by adjacent cross-correlation</option></select></label>
+        <label class="small"><b>Angular bins</b> <select id="ringFieldBins" disabled><option value="72">72</option><option value="120" selected>120</option><option value="180">180</option><option value="360">360</option></select></label>
+        <label class="small"><b>Seam / zero</b> <input id="ringFieldSeam" type="range" min="0" max="359" step="1" value="0" disabled/> <span id="ringFieldSeamLabel">0°</span></label>
+        <label class="small"><b>Angular smooth</b> <input id="ringFieldSmooth" type="range" min="0" max="15" step="1" value="2" disabled/> <span id="ringFieldSmoothLabel">2</span></label>
+        <label class="small"><input id="ringFieldNormalize" type="checkbox" disabled/> normalize each slice amplitude</label>
+        <label class="small"><input id="ringFieldFillMissing" type="checkbox" checked disabled/> interpolate missing angular bins</label>
+      </div>
+      <canvas id="ringFieldCanvas" width="1200" height="520" style="margin-top:8px;height:520px"></canvas>
+      <div id="ringFieldOut" class="small mono" style="margin-top:8px;min-height:62px;border:1px solid #e5ebf3;border-radius:10px;background:#fff;padding:8px">Ring Field pending. Analyze with Slice Engine, then open Experimental.</div>
+      <div class="small" style="margin-top:8px"><b>Read:</b> Angular mode makes every ring the same 0–360° width for registration. Polyline-length mode preserves cumulative length after angular sorting; it is an estimate, not a topologically reconstructed contour perimeter. Vertical/diagonal corridors can reveal stable or traveling surface features; patterns that survive center, alignment, signal, and layout changes are stronger candidates for whole-form coherence.</div>
+    </div>
+  </div>
+</div>
+
 <div class="row" style="margin-top:14px">
   <div class="card">
-    <div class="small"><b>Fingerprint cards</b> (plain-English metrics you can share)</div>
+    <div class="small"><b>Fingerprint cards</b> (ELI5 metrics you can share)</div>
     <div id="cards"></div>
   </div>
 </div>
@@ -1028,6 +1145,8 @@ Drop one or many <span class="pill">.stl</span> files. FLEX runs locally: no mod
   const scoutOut = $("scoutOut");
 const glCanvas = $("glCanvas");
   const ghostCanvas = $("ghostCanvas");
+  const axisCompassCanvas = $("axisCompass");
+  const showAxisCompassEl = $("showAxisCompass");
   const viewerCard = $("viewerCard");
   const fullscreen3DBtn = $("fullscreen3D");
   const museumSpinBtn = $("museumSpin");
@@ -1130,6 +1249,8 @@ const exportBandsBtn = $("exportBands");
   const coherencePresetBtn = $("coherencePreset");
   const resetMusicDefaultsBtn = $("resetMusicDefaults");
   const musicStatusEl = $("musicStatus");
+  const cfMusicDensityEl = $("cfMusicDensity");
+  const cfMusicAngleToneEl = $("cfMusicAngleTone");
 
   // v5.2.20: Helical Needle Lab controls — downstream surface modulation lens
   const helicalCanvas = $("helicalCanvas");
@@ -1150,6 +1271,23 @@ const exportBandsBtn = $("exportBands");
   const helicalUseMusicWindowEl = $("helicalUseMusicWindow");
   const helicalAutoScanBtn = $("helicalAutoScan");
   const exportHelicalCSVBtn = $("exportHelicalCSV");
+
+  // v5.2.33: Ring Field / circumferential unwrap controls
+  const ringFieldCanvas = $("ringFieldCanvas");
+  const ringFieldOut = $("ringFieldOut");
+  const ringFieldViewEl = $("ringFieldView");
+  const ringFieldCenterEl = $("ringFieldCenter");
+  const ringFieldSignalEl = $("ringFieldSignal");
+  const ringFieldAlignEl = $("ringFieldAlign");
+  const ringFieldBinsEl = $("ringFieldBins");
+  const ringFieldSeamEl = $("ringFieldSeam");
+  const ringFieldSeamLabelEl = $("ringFieldSeamLabel");
+  const ringFieldSmoothEl = $("ringFieldSmooth");
+  const ringFieldSmoothLabelEl = $("ringFieldSmoothLabel");
+  const ringFieldNormalizeEl = $("ringFieldNormalize");
+  const ringFieldFillMissingEl = $("ringFieldFillMissing");
+  const exportRingFieldPNGBtn = $("exportRingFieldPNG");
+  const exportRingFieldCSVBtn = $("exportRingFieldCSV");
 
   const setStatus = (s)=> statusEl.textContent = "Status: " + s;
 
@@ -1295,7 +1433,7 @@ const exportBandsBtn = $("exportBands");
   const ANALYSIS_CACHE = new Map();
   let _autoRunTimer = null;
   function currentAnalysisSignature(overrides={}){
-    const mode = overrides.fitMode ?? (fitMode ? fitMode.value : "fixed");
+    const mode = overrides.fitMode ?? (fitMode ? fitMode.value : "fit");
     const meas = overrides.measureMode ?? (measureMode ? measureMode.value : "vertex");
     const axis = (overrides.axisMode ?? (axisMode ? axisMode.value : "z")).toLowerCase();
     return JSON.stringify({
@@ -1317,7 +1455,7 @@ const exportBandsBtn = $("exportBands");
   }
   function currentActiveAnalysisOpts(){
     return {
-      fitMode: fitMode ? (fitMode.value || "fixed") : "fixed",
+      fitMode: fitMode ? (fitMode.value || "fit") : "fit",
       measureMode: measureMode ? (measureMode.value || "vertex") : "vertex",
       axisMode: axisMode ? (axisMode.value || "z") : "z",
       centerLockGlobal: !!(centerLock && centerLock.checked)
@@ -1525,15 +1663,21 @@ const exportBandsBtn = $("exportBands");
     return out;
   }
 
+  function neutralStepFromRange(range){
+    const lo=Number(range?.kMin), hi=Number(range?.kMax);
+    if(isFinite(lo) && isFinite(hi) && lo>1 && hi>lo) return Math.sqrt(lo*hi);
+    return 1.25;
+  }
+
   // -----------------------------
   // Core analysis: shared snap rule
   // -----------------------------
   function analyzeFromR50(zArr, r50, opts={}){
     const smoothWin = opts.smoothWin ?? 0;
-    const fitModeNow = opts.fitMode ?? "fixed";
+    const fitModeNow = opts.fitMode ?? "fit";
     const r50s = movingAverage(r50, smoothWin);
 
-    let k = (opts.kFixed && (fitModeNow !== "fit")) ? opts.kFixed : (Math.sqrt(6)/2);
+    let k = (opts.kFixed && (fitModeNow !== "fit")) ? opts.kFixed : neutralStepFromRange(opts.fitRange);
     if (fitModeNow === "fit"){
       k = fitK(r50s, opts.fitRange).kBest;
     }
@@ -1603,7 +1747,7 @@ const exportBandsBtn = $("exportBands");
     const smoothWin = opts.smoothWin ?? 0;
     const r50s = movingAverage(r50, smoothWin);
     const m = r50s.length;
-    const fitRange = opts.fitRange || {kMin:1.12,kMax:1.32,kStep:0.0015};
+    const fitRange = opts.fitRange || {kMin:1.05,kMax:2.00,kStep:0.002};
 
     const minLen = clamp(parseInt(opts.minBandSlices ?? 18,10), 6, 300);
     const bandPenalty = Math.max(0, parseFloat(opts.bandPenalty ?? 0.020));
@@ -1623,7 +1767,7 @@ const exportBandsBtn = $("exportBands");
       if (allowFit){
         seg = analyzeFromR50(zSub, rSub, {fitMode:"fit", smoothWin:0, fitRange});
       } else {
-        seg = analyzeFromR50(zSub, rSub, {fitMode:"fixed", smoothWin:0, fitRange, kFixed:(Math.sqrt(6)/2)});
+        seg = analyzeFromR50(zSub, rSub, {fitMode:"fixed", smoothWin:0, fitRange, kFixed:neutralStepFromRange(fitRange)});
       }
 
       // Normalize medianAbs by typical size so penalty behaves across scales.
@@ -1811,7 +1955,7 @@ const exportBandsBtn = $("exportBands");
     const neck = findNeck(zArr, r50s);
 
     return {
-      k: centers.length ? centers[0] : (Math.sqrt(6)/2),
+      k: centers.length ? centers[0] : neutralStepFromRange(fitRange),
       c: 0,
       s: 1,
       kBySlice,
@@ -1839,11 +1983,11 @@ const exportBandsBtn = $("exportBands");
   }
 
   function fitK(r50, range){
-    const rMin = range?.kMin ?? 1.12;
-    const rMax = range?.kMax ?? 1.32;
-    const step = range?.kStep ?? 0.0015;
+    const rMin = range?.kMin ?? 1.05;
+    const rMax = range?.kMax ?? 2.00;
+    const step = range?.kStep ?? 0.002;
 
-    let best = {kBest: Math.sqrt(6)/2, purity:-1, medianAbs:Infinity};
+    let best = {kBest: neutralStepFromRange(range), purity:-1, medianAbs:Infinity};
     for(let k=rMin;k<=rMax+1e-12;k+=step){
       const logk = Math.log(k);
       const fracs=[];
@@ -2402,7 +2546,7 @@ async function measureSliceEngine(vertices, bbox, opts={}){
   // Full analyze wrapper
   // -----------------------------
   async function analyze(vertices, bbox, opts={}){
-    const fitModeNow = opts.fitMode ?? "fixed";
+    const fitModeNow = opts.fitMode ?? "fit";
     const measureNow = opts.measureMode ?? "vertex";
     const axisModeNow = (opts.axisMode || "z").toLowerCase();
     const runId = (opts.runId ?? RUN_ID);
@@ -2463,7 +2607,7 @@ async function measureSliceEngine(vertices, bbox, opts={}){
       return {
         N_slices_used: zArr.length,
         bbox,
-        k: Math.sqrt(6)/2, c:0, s:1,
+        k: neutralStepFromRange({kMin:parseFloat(kMinEl?.value),kMax:parseFloat(kMaxEl?.value)}), c:0, s:1,
         rmse:0, medianAbs:0,
         snapPurity:0,
         z: zArr, r10, r50, r90, spread,
@@ -2472,7 +2616,7 @@ async function measureSliceEngine(vertices, bbox, opts={}){
         repeat: {lag:0,corr:0,periodZ:0},
         texture: { median: median(spread), mean: spread.reduce((a,b)=>a+b,0)/Math.max(1,spread.length) },
         classification: {label:"Insufficient data", why:"Not enough slice samples. Try Vertex mode or lower thresholds."},
-        fit: {mode: fitModeNow, kBest: Math.sqrt(6)/2, objective:"n/a"},
+        fit: {mode: fitModeNow, kBest: neutralStepFromRange({kMin:parseFloat(kMinEl?.value),kMax:parseFloat(kMaxEl?.value)}), objective:"n/a"},
         measure: {mode: measureNow, why: meas.why, centerline: meas.centerline || null, slicePts: meas.slicePts || null},
         reciprocal: {pairs:[], score:0, meanAbsLogClosure:0, best:[], apexBand:0},
         fixedCenter: computeFixedCenterDiagnostics(zArr, r50, r10, r90, {active: !!opts.centerLockGlobal, reference: (opts.centerLockGlobal?"fixed center":"local center"), axisSpan: axisSpanFromBBox(bbox, axisModeNow)})
@@ -2512,7 +2656,7 @@ async function measureSliceEngine(vertices, bbox, opts={}){
       repeat,
       texture: { median: texMedian, mean: texMean },
       classification: cls,
-      fit: {mode: fitModeNow, kBest: snapped.k, objective: (fitModeNow==="fit"?"grid":(fitModeNow==="piecewise"?"piecewise":"fixed"))},
+      fit: {mode: fitModeNow, kBest: snapped.k, objective: (fitModeNow==="fit"?"bounded-grid":(fitModeNow==="piecewise"?"penalized-piecewise":"fixed-reference")), searchDomain:fitRange},
       measure: {mode: measureNow, why: meas.why, centerline: meas.centerline || null, slicePts: meas.slicePts || null},
       ratioDiagnostics: computeBandRatioDiagnostics(snapped.bands),
       reciprocal: computeReciprocalTraversal({bands: snapped.bands, landmarks: snapped.landmarks}),
@@ -2649,7 +2793,7 @@ async function measureSliceEngine(vertices, bbox, opts={}){
     }
 
     g.fillStyle="#333";
-    g.fillText("Width (radius)", 8, 18);
+    g.fillText("Radial distance", 8, 18);
     g.fillText("Height → (bottom to top)", w-190, h-15);
 
     g.fillStyle="#666";
@@ -2670,7 +2814,7 @@ async function measureSliceEngine(vertices, bbox, opts={}){
 
     g.fillStyle = "#111";
     g.fillRect(lx, ly, 18, 3);
-    g.fillText("median width (measured)", lx+26, ly+4);
+    g.fillText("median radial distance (measured)", lx+26, ly+4);
 
     g.fillStyle = "#0a0";
     g.fillRect(lx, ly+14, 4, 4);
@@ -2794,7 +2938,7 @@ async function measureSliceEngine(vertices, bbox, opts={}){
     drawGridY(g,w,h,pad,5);
 
     const z = res.z || [];
-    const ks = res.kBySlice || z.map(()=>res.k || (Math.sqrt(6)/2));
+    const ks = res.kBySlice || z.map(()=>res.k || neutralStepFromRange({kMin:parseFloat(kMinEl?.value),kMax:parseFloat(kMaxEl?.value)}));
 
     if (!z.length){
       g.fillStyle="#666";
@@ -2831,7 +2975,7 @@ async function measureSliceEngine(vertices, bbox, opts={}){
       for(const b of res.bands){
         const x0 = pad + b.z0*(w-pad-10);
         const x1 = pad + b.z1*(w-pad-10);
-        const kHere = (b.k || res.k || (Math.sqrt(6)/2));
+        const kHere = (b.k || res.k || neutralStepFromRange({kMin:parseFloat(kMinEl?.value),kMax:parseFloat(kMaxEl?.value)}));
         const y = 10 + (kMax - kHere)/span * (h-pad-10);
         g.fillStyle = "rgba(0,0,0,0.15)";
         g.fillRect(x0, y-3, Math.max(2,x1-x0), 6);
@@ -2879,13 +3023,13 @@ async function measureSliceEngine(vertices, bbox, opts={}){
     if(!realScaleInfo) return;
     const cal = getRealCalibration(res);
     if(!res){
-      realScaleInfo.textContent = "Optional: enter object height to derive real widths, spans, and deltas.";
+      realScaleInfo.textContent = "Optional: enter object height to derive real radii, spans, and deltas.";
       return;
     }
     if(cal.enabled){
       realScaleInfo.innerHTML = `Active: ${cal.height.toFixed(3)} ${cal.unit} height on ${String(cal.axis).toUpperCase()} axis. Model span ${cal.modelSpan.toFixed(4)} ⇒ 1 model unit = ${cal.scale.toFixed(5)} ${cal.unit}.`;
     } else {
-      realScaleInfo.textContent = "Optional: enter object height to derive real widths, spans, and deltas.";
+      realScaleInfo.textContent = "Optional: enter object height to derive real radii, spans, and deltas.";
     }
   }
 
@@ -2943,8 +3087,6 @@ async function measureSliceEngine(vertices, bbox, opts={}){
     const phi = (1+rt(5))/2;
     return [
       {name:"1", value:1},
-      {name:"√6/2", value:rt(6)/2},
-      {name:"2/√6", value:2/rt(6)},
       {name:"√1.5", value:rt(1.5)},
       {name:"1/√1.5", value:1/rt(1.5)},
       {name:"3/2", value:1.5},
@@ -3225,7 +3367,7 @@ async function measureSliceEngine(vertices, bbox, opts={}){
       const zMid = st.zMid*cal.height;
       return `<tr class="${supportClass(st)}"><td>${stepBtn(st)}</td><td>${zMid.toFixed(3)} ${cal.unit}</td><td>${(raw0*cal.scale).toFixed(3)} ${cal.unit}</td><td>${(raw1*cal.scale).toFixed(3)} ${cal.unit}</td><td>${rawDelta>=0?'+':''}${rawDelta.toFixed(3)} ${cal.unit}</td><td>${snapDelta>=0?'+':''}${snapDelta.toFixed(3)} ${cal.unit}</td><td>${drift>=0?'+':''}${drift.toFixed(3)} ${cal.unit}</td><td>${escapeHtml(st.support)}</td></tr>`;
     }).join("") : "";
-    const realCard = cal.enabled ? `<div class="grammarBox"><b>Real-unit step changes</b><div class="tiny">Calibration: ${cal.height.toFixed(3)} ${cal.unit} object height on ${String(cal.axis).toUpperCase()} axis; 1 model unit = ${cal.scale.toFixed(5)} ${cal.unit}. Ratios are unchanged; this only converts widths, Z positions, and deltas into real units.</div><table class="grammarTbl"><thead><tr><th>Step</th><th>Z mid</th><th>Raw A</th><th>Raw B</th><th>Raw Δ</th><th>Snap Δ</th><th>Raw−snap Δ</th><th>Support</th></tr></thead><tbody>${realRows || '<tr><td colspan="8">No step rows.</td></tr>'}</tbody></table></div>` : `<div class="grammarBox"><b>Real-unit step changes</b><div class="tiny">Enter optional real-world height above to convert widths, Z offsets, and raw/snap deltas into mm or inches. Ratios stay dimensionless and unchanged.</div></div>`;
+    const realCard = cal.enabled ? `<div class="grammarBox"><b>Real-unit step changes</b><div class="tiny">Calibration: ${cal.height.toFixed(3)} ${cal.unit} object height on ${String(cal.axis).toUpperCase()} axis; 1 model unit = ${cal.scale.toFixed(5)} ${cal.unit}. Ratios are unchanged; this only converts radii, Z positions, and deltas into real units.</div><table class="grammarTbl"><thead><tr><th>Step</th><th>Z mid</th><th>Raw A</th><th>Raw B</th><th>Raw Δ</th><th>Snap Δ</th><th>Raw−snap Δ</th><th>Support</th></tr></thead><tbody>${realRows || '<tr><td colspan="8">No step rows.</td></tr>'}</tbody></table></div>` : `<div class="grammarBox"><b>Real-unit step changes</b><div class="tiny">Enter optional real-world height above to convert radii, Z offsets, and raw/snap deltas into mm or inches. Ratios stay dimensionless and unchanged.</div></div>`;
     derivativeGrammarOut.innerHTML = `
       <div class="kv">
         <span class="pill">read <b>${escapeHtml(dg.read)}</b></span>
@@ -4148,6 +4290,83 @@ async function measureSliceEngine(vertices, bbox, opts={}){
     g.fillStyle="#555"; g.fillText("ELI5: a sphere is a half-circle in slice view; this plot subtracts that curve so a true sphere goes quiet.", 18, h-22);
   }
 
+
+
+  // v5.2.34: centroid trajectory / center preference lenses
+  // Downstream only: these reuse Slice Engine local-center records and do not alter measurement math.
+  function getXYZCenterlineRun(runsAnalyzed){
+    return runsAnalyzed.find(r=>r.id===activeId && r.xyz?.x?.measure?.centerline && r.xyz?.y?.measure?.centerline && r.xyz?.z?.measure?.centerline)
+      || runsAnalyzed.find(r=>r.xyz?.x?.measure?.centerline && r.xyz?.y?.measure?.centerline && r.xyz?.z?.measure?.centerline);
+  }
+  function centerlineStats(res){
+    const cl=res?.measure?.centerline, z=res?.z||[];
+    const cx=(cl?.cxRaw||cl?.cx||[]).slice(), cy=(cl?.cyRaw||cl?.cy||[]).slice();
+    const n=Math.min(z.length,cx.length,cy.length);
+    if(n<4) return null;
+    const zz=z.slice(0,n), x=cx.slice(0,n), y=cy.slice(0,n);
+    const mean=a=>a.reduce((s,v)=>s+v,0)/Math.max(1,a.length);
+    const mx=mean(x), my=mean(y);
+    let pointE=0; for(let i=0;i<n;i++) pointE+=(x[i]-mx)**2+(y[i]-my)**2; pointE/=n;
+    function linfit(a,b){ const ma=mean(a), mb=mean(b); let num=0,den=0; for(let i=0;i<a.length;i++){num+=(a[i]-ma)*(b[i]-mb);den+=(a[i]-ma)**2;} const m=den?num/den:0; return {m,b:mb-m*ma}; }
+    const fx=linfit(zz,x), fy=linfit(zz,y);
+    let axisE=0, pathLen=0, chord=0, bend=0;
+    for(let i=0;i<n;i++){ const dx=x[i]-(fx.m*zz[i]+fx.b), dy=y[i]-(fy.m*zz[i]+fy.b); axisE+=dx*dx+dy*dy; if(i){ const sx=x[i]-x[i-1], sy=y[i]-y[i-1], sz=zz[i]-zz[i-1]; pathLen+=Math.hypot(sx,sy,sz); } }
+    axisE/=n; chord=Math.hypot(x[n-1]-x[0],y[n-1]-y[0],zz[n-1]-zz[0]);
+    for(let i=1;i<n-1;i++){ const ax=x[i]-x[i-1], ay=y[i]-y[i-1], az=zz[i]-zz[i-1]; const bx=x[i+1]-x[i], by=y[i+1]-y[i], bz=zz[i+1]-zz[i]; const an=Math.hypot(ax,ay,az)||1,bn=Math.hypot(bx,by,bz)||1; bend+=Math.acos(clamp((ax*bx+ay*by+az*bz)/(an*bn),-1,1)); }
+    const radius=Math.max(1e-9, median(res.r50||[1]));
+    const driftRms=Math.sqrt(pointE)/radius, axisRms=Math.sqrt(axisE)/radius;
+    const tortuosity=pathLen/Math.max(1e-9,chord);
+    return {z:zz,x,y,mx,my,fx,fy,pointE,axisE,driftRms,axisRms,tortuosity,bend:bend/Math.max(1,n-2),radius};
+  }
+  function drawCentroidTrajectoryLens(g,runsAnalyzed){
+    const w=scaffoldCv.width,h=scaffoldCv.height; g.clearRect(0,0,w,h); g.fillStyle='#fff'; g.fillRect(0,0,w,h); g.strokeStyle='#eee'; g.strokeRect(.5,.5,w-1,h-1);
+    g.font='12px '+getComputedStyle(document.body).fontFamily; g.fillStyle='#333'; g.fillText('Centroid Trajectory Lens — estimated local centers as a living XYZ spine',8,18);
+    const run=getXYZCenterlineRun(runsAnalyzed); if(!run){ g.fillStyle='#666'; g.fillText('Run Slice Engine with cross-axis agreement enabled. This lens needs local centerlines for X, Y, and Z.',20,54); return; }
+    const defs=[['X',run.xyz.x,'#287828'],['Y',run.xyz.y,'#3c50a0'],['Z',run.xyz.z,'#111']].map(([k,r,c])=>({k,r,c,s:centerlineStats(r)})).filter(d=>d.s);
+    if(!defs.length){g.fillStyle='#666';g.fillText('No usable local-centroid trajectories found.',20,54);return;}
+    let maxAbs=1e-9; for(const d of defs){for(let i=0;i<d.s.x.length;i++)maxAbs=Math.max(maxAbs,Math.abs(d.s.x[i]-d.s.mx),Math.abs(d.s.y[i]-d.s.my));}
+    const panels=[{x:40,y:48,w:(w-100)/3,h:h-122},{x:50+(w-100)/3,y:48,w:(w-100)/3,h:h-122},{x:60+2*(w-100)/3,y:48,w:(w-100)/3,h:h-122}];
+    defs.forEach((d,di)=>{const p=panels[di]; g.strokeStyle='#ddd';g.strokeRect(p.x,p.y,p.w,p.h); g.fillStyle=d.c;g.fillText(`${d.k}-slice local centroid path`,p.x+8,p.y+18); const X=v=>p.x+p.w/2+(v/maxAbs)*(p.w*.40), Y=z=>p.y+p.h-18-z*(p.h-42); g.strokeStyle='rgba(0,0,0,.12)';g.setLineDash([4,4]);g.beginPath();g.moveTo(X(0),p.y+28);g.lineTo(X(0),p.y+p.h-18);g.stroke();g.setLineDash([]);
+      const draw=(arr,color,lw)=>{g.strokeStyle=color;g.lineWidth=lw;g.beginPath();arr.forEach((q,i)=>i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]));g.stroke();};
+      draw(d.s.z.map((z,i)=>[X(d.s.x[i]-d.s.mx),Y(z)]),d.c,2.4); draw(d.s.z.map((z,i)=>[X(d.s.y[i]-d.s.my),Y(z)]),d.c+'99',1.5);
+      const fit=d.s.z.map(z=>[X((d.s.fx.m*z+d.s.fx.b)-d.s.mx),Y(z)]); g.setLineDash([5,4]);draw(fit,'rgba(0,0,0,.35)',1.2);g.setLineDash([]);
+      g.fillStyle='#555';g.font='11px ui-monospace,monospace';g.fillText(`drift RMS/r ${d.s.driftRms.toFixed(4)}`,p.x+8,p.y+p.h-40);g.fillText(`axis residual/r ${d.s.axisRms.toFixed(4)}`,p.x+8,p.y+p.h-25);g.fillText(`tortuosity ${d.s.tortuosity.toFixed(4)}`,p.x+8,p.y+p.h-10);
+    });
+    g.font='12px '+getComputedStyle(document.body).fontFamily;g.fillStyle='#555';g.fillText('Solid = first local-center coordinate; pale = second coordinate; dashed = best straight-axis projection. Smooth migration suggests a connected spine rather than disconnected local centers.',18,h-18);
+  }
+  function drawCenterPreferenceLens(g,runsAnalyzed){
+    const w=scaffoldCv.width,h=scaffoldCv.height; g.clearRect(0,0,w,h);g.fillStyle='#fff';g.fillRect(0,0,w,h);g.strokeStyle='#eee';g.strokeRect(.5,.5,w-1,h-1);g.font='12px '+getComputedStyle(document.body).fontFamily;g.fillStyle='#333';g.fillText('Center Preference Lens — one point vs one straight axis vs a curving local-centroid spine',8,18);
+    const run=getXYZCenterlineRun(runsAnalyzed);if(!run){g.fillStyle='#666';g.fillText('Run Slice Engine with cross-axis agreement enabled to compare center models.',20,54);return;}
+    const defs=[['X',run.xyz.x],['Y',run.xyz.y],['Z',run.xyz.z]].map(([k,r])=>({k,r,s:centerlineStats(r)})).filter(d=>d.s);
+    if(!defs.length){g.fillStyle='#666';g.fillText('No usable local-centroid records.',20,54);return;}
+    const mean=a=>a.reduce((s,v)=>s+v,0)/Math.max(1,a.length);
+    const pointErr=mean(defs.map(d=>d.s.driftRms)); const axisErr=mean(defs.map(d=>d.s.axisRms));
+    const rough=mean(defs.map(d=>Math.max(0,d.s.tortuosity-1)+d.s.bend));
+    const spineErr=Math.max(.0001,rough*.20);
+    const errs=[{name:'Single center',e:pointErr,note:'sphere-like point reference'},{name:'Straight axis',e:axisErr,note:'cylinder / pill reference'},{name:'Curving spine',e:spineErr,note:'smooth migrating local reference'}];
+    const maxE=Math.max(...errs.map(x=>x.e),1e-6), minE=Math.min(...errs.map(x=>x.e));
+    const left=80,top=72,barW=w-360,rowH=68; errs.forEach((m,i)=>{const y=top+i*rowH;const score=clamp(1-m.e/(maxE*1.08),0,1);g.fillStyle='#333';g.fillText(m.name,left,y);g.fillStyle='#eee';g.fillRect(left+130,y-13,barW,18);g.fillStyle=m.e===minE?'#0a7':'#222';g.fillRect(left+130,y-13,barW*score,18);g.fillStyle='#555';g.font='11px ui-monospace,monospace';g.fillText(`normalized residual ${m.e.toFixed(5)}`,left+140+barW,y);g.font='11px '+getComputedStyle(document.body).fontFamily;g.fillText(m.note,left+130,y+22);});
+    const winner=errs.reduce((a,b)=>b.e<a.e?b:a);g.fillStyle='#111';g.font='14px '+getComputedStyle(document.body).fontFamily;g.fillText(`Current simplest center model: ${winner.name}`,left,top+errs.length*rowH+18);
+    const sx=w-260,sy=60;g.fillStyle='#fafafa';g.fillRect(sx,sy,230,190);g.strokeStyle='#ddd';g.strokeRect(sx+.5,sy+.5,230,190);g.fillStyle='#333';g.font='12px '+getComputedStyle(document.body).fontFamily;g.fillText('Axis-by-axis center read',sx+12,sy+22);g.font='11px ui-monospace,monospace';let yy=sy+48;for(const d of defs){g.fillText(`${d.k}: drift ${d.s.driftRms.toFixed(4)}`,sx+12,yy);yy+=18;g.fillText(`   axis ${d.s.axisRms.toFixed(4)}  tort ${d.s.tortuosity.toFixed(4)}`,sx+12,yy);yy+=24;}
+    g.font='12px '+getComputedStyle(document.body).fontFamily;g.fillStyle='#555';g.fillText('Interpret as descriptive compression, not manufacturing proof. A low curving-spine residual asks whether local centers form one coherent trajectory.',18,h-20);
+  }
+
+  function drawSpineDiagnosticsLens(g,runsAnalyzed){
+    const w=scaffoldCv.width,h=scaffoldCv.height; g.clearRect(0,0,w,h); g.fillStyle='#fff';g.fillRect(0,0,w,h);g.strokeStyle='#eee';g.strokeRect(.5,.5,w-1,h-1);
+    g.font='12px '+getComputedStyle(document.body).fontFamily;g.fillStyle='#333';g.fillText('Spine Diagnostics — how the inferred local reference moves through the form',8,18);
+    const run=getXYZCenterlineRun(runsAnalyzed); if(!run){g.fillStyle='#666';g.fillText('Run Slice Engine with cross-axis agreement enabled to inspect X/Y/Z centerline diagnostics.',20,54);return;}
+    const defs=[['X',run.xyz.x],['Y',run.xyz.y],['Z',run.xyz.z]].map(([k,r])=>({k,s:centerlineStats(r)})).filter(d=>d.s);
+    if(!defs.length){g.fillStyle='#666';g.fillText('No usable centerline records.',20,54);return;}
+    const metrics=[['drift RMS / radius','driftRms'],['straight-axis residual / radius','axisRms'],['path tortuosity','tortuosity'],['mean bend (rad/step)','bend']];
+    const left=70,top=60,rowH=54,labelW=210,plotW=w-labelW-150;
+    const maxima={}; for(const [label,key] of metrics) maxima[key]=Math.max(...defs.map(d=>d.s[key]||0),1e-9);
+    metrics.forEach(([label,key],mi)=>{const y=top+mi*rowH;g.fillStyle='#333';g.fillText(label,left,y);defs.forEach((d,di)=>{const yy=y+14+di*11;const v=d.s[key]||0;g.fillStyle=['#287828','#3c50a0','#111'][di];g.fillRect(left+labelW,yy-8,plotW*(v/maxima[key]),7);g.font='10px ui-monospace,monospace';g.fillText(`${d.k} ${v.toFixed(5)}`,left+labelW+plotW+8,yy-1);});g.font='12px '+getComputedStyle(document.body).fontFamily;});
+    const avg=k=>defs.reduce((a,d)=>a+(d.s[k]||0),0)/defs.length;
+    const read=avg('axisRms')<0.01?'near-coaxial straight reference':avg('tortuosity')<1.02?'gently migrating reference spine':'pronounced curving / wandering reference';
+    g.fillStyle='#111';g.font='14px '+getComputedStyle(document.body).fontFamily;g.fillText(`Current descriptive read: ${read}`,left,top+metrics.length*rowH+30);
+    g.fillStyle='#555';g.font='12px '+getComputedStyle(document.body).fontFamily;g.fillText('Low drift favors a point; low straight-axis residual favors a cylinder/lathe line; low-noise curvature with higher axis residual favors a connected floating spine.',18,h-22);
+  }
+
   function drawScaffoldViews(runsAnalyzed){
     if (!scaffoldCv) return;
     const g = clearCanvas(scaffoldCv);
@@ -4166,12 +4385,16 @@ async function measureSliceEngine(vertices, bbox, opts={}){
     const shown = runsAnalyzed.filter(r=>r.res).filter(r=> all ? true : (r.id===activeId));
     if (!shown.length) return;
 
-    if (mode === "hologram"){
-      drawXYZScaffoldHologram(g, runsAnalyzed.filter(r=>r.res));
+    if (mode === "centroidTrajectory"){
+      drawCentroidTrajectoryLens(g, runsAnalyzed.filter(r=>r.res));
       return;
     }
-    if (mode === "halfsphere"){
-      drawXYZHalfSphereLockLens(g, runsAnalyzed.filter(r=>r.res));
+    if (mode === "centerPreference"){
+      drawCenterPreferenceLens(g, runsAnalyzed.filter(r=>r.res));
+      return;
+    }
+    if (mode === "spineDiagnostics"){
+      drawSpineDiagnosticsLens(g, runsAnalyzed.filter(r=>r.res));
       return;
     }
     if (mode === "reciprocal"){
@@ -4804,6 +5027,72 @@ function renderCards(runs){
     return false;
   }
 
+  function drawAxisCompass(R){
+    if (!axisCompassCanvas || !R) return;
+    const visible = !showAxisCompassEl || showAxisCompassEl.checked;
+    axisCompassCanvas.style.display = visible ? "block" : "none";
+    if (!visible) return;
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const cssSize = 78;
+    const want = Math.round(cssSize*dpr);
+    if (axisCompassCanvas.width !== want || axisCompassCanvas.height !== want){
+      axisCompassCanvas.width = want; axisCompassCanvas.height = want;
+    }
+    const g = axisCompassCanvas.getContext("2d");
+    g.setTransform(dpr,0,0,dpr,0,0);
+    g.clearRect(0,0,cssSize,cssSize);
+    const dark = document.body.classList.contains("flexCanvasDark");
+    const cx=38, cy=41, len=25;
+    const active = String((axisMode && axisMode.value) || "z").toLowerCase();
+    const axes = [
+      {key:"x", label:"X", color:"#e53935", v:[1,0,0]},
+      {key:"y", label:"Y", color:"#22a447", v:[0,1,0]},
+      {key:"z", label:"Z", color:"#1976d2", v:[0,0,1]}
+    ].map(a=>{
+      const [x,y,z]=a.v;
+      return {...a,
+        rx:R[0]*x+R[4]*y+R[8]*z,
+        ry:R[1]*x+R[5]*y+R[9]*z,
+        rz:R[2]*x+R[6]*y+R[10]*z
+      };
+    }).sort((a,b)=>a.rz-b.rz); // back axes first
+
+    g.lineCap="round"; g.lineJoin="round";
+    // compact origin marker
+    g.fillStyle=dark?"rgba(255,255,255,.72)":"rgba(20,20,20,.72)";
+    g.beginPath(); g.arc(cx,cy,2.5,0,Math.PI*2); g.fill();
+
+    for(const a of axes){
+      const ex=cx+a.rx*len, ey=cy-a.ry*len;
+      const alpha=0.48+0.52*((a.rz+1)/2);
+      g.globalAlpha=alpha;
+      if(a.key===active){
+        g.strokeStyle=dark?"rgba(255,255,255,.76)":"rgba(0,0,0,.35)";
+        g.lineWidth=4.8;
+        g.beginPath(); g.moveTo(cx,cy); g.lineTo(ex,ey); g.stroke();
+      }
+      g.strokeStyle=a.color; g.fillStyle=a.color; g.lineWidth=a.key===active?2.9:2.2;
+      g.beginPath(); g.moveTo(cx,cy); g.lineTo(ex,ey); g.stroke();
+      const ang=Math.atan2(ey-cy,ex-cx), ah=5.5;
+      g.beginPath();
+      g.moveTo(ex,ey);
+      g.lineTo(ex-ah*Math.cos(ang-0.48),ey-ah*Math.sin(ang-0.48));
+      g.lineTo(ex-ah*Math.cos(ang+0.48),ey-ah*Math.sin(ang+0.48));
+      g.closePath(); g.fill();
+      g.globalAlpha=1;
+      g.font=(a.key===active?"700 ":"650 ")+"10px system-ui,-apple-system,Segoe UI,sans-serif";
+      g.textAlign="center"; g.textBaseline="middle";
+      const lx=ex+8*Math.cos(ang), ly=ey+8*Math.sin(ang);
+      g.fillStyle=a.color;
+      g.fillText(a.label,lx,ly);
+    }
+    g.globalAlpha=1;
+    g.font="650 9px system-ui,-apple-system,Segoe UI,sans-serif";
+    g.textAlign="left"; g.textBaseline="alphabetic";
+    g.fillStyle=dark?"rgba(255,255,255,.72)":"rgba(0,0,0,.58)";
+    g.fillText(`ACTIVE ${active.toUpperCase()}`,7,97);
+  }
+
   function renderGL(){
     if (!gl || !prog) return;
     resizeGLCanvasToDPR();
@@ -4818,6 +5107,7 @@ function renderCards(runs){
     const P = matPerspective(0.8, aspect, 0.1, 100.0);
     const T = matTranslate(view.panX, view.panY, -view.zoom);
     const R = matMul(matRotY(view.rotY), matRotX(view.rotX));
+    drawAxisCompass(R);
     const MVP = matMul(P, matMul(T, R));
 
     const uMVP = gl.getUniformLocation(prog, "uMVP");
@@ -5098,7 +5388,7 @@ function renderCards(runs){
     if (musicUseRawEl) musicUseRawEl.disabled = !anyActive;
     if (musicCenterToneEl) musicCenterToneEl.disabled = !anyActive;
     if (musicFollowSliceEl) musicFollowSliceEl.disabled = !anyActive;
-    document.querySelectorAll('#musicMode,#musicBase,#musicSpeed,#musicWave,#musicTraversal,#musicLoop,#musicPasses,#musicStartPhase,#musicEndPhase,#musicMap,#musicScale,#musicSpan,#musicRecipStyle,#musicFilter,#musicUseRaw,#musicCenterTone,#musicFollowSlice,#musicPan,#musicClosureBell,#musicAmpByDeviation,#musicScrub,#auditionSlice,#coherencePreset,#resetMusicDefaults').forEach(el=>{ el.disabled = !anyActive; });
+    document.querySelectorAll('#musicMode,#musicBase,#musicSpeed,#musicWave,#musicTraversal,#musicLoop,#musicPasses,#musicStartPhase,#musicEndPhase,#musicMap,#musicScale,#musicSpan,#musicRecipStyle,#musicFilter,#musicUseRaw,#musicCenterTone,#musicFollowSlice,#musicPan,#musicClosureBell,#musicAmpByDeviation,#musicScrub,#auditionSlice,#coherencePreset,#resetMusicDefaults,#cfMusicDensity,#cfMusicAngleTone').forEach(el=>{ el.disabled = !anyActive; });
     if (musicSpanLabelEl && musicSpanEl) musicSpanLabelEl.textContent = musicSpanEl.value;
     if (musicScrubLabelEl && musicScrubEl) musicScrubLabelEl.textContent = (parseInt(musicScrubEl.value||'500',10)/1000).toFixed(3);
 
@@ -5109,6 +5399,12 @@ function renderCards(runs){
     if (helicalPhaseLabelEl && helicalPhaseEl) helicalPhaseLabelEl.textContent = `${parseInt(helicalPhaseEl.value||'0',10)}°`;
     if (helicalDriftLabelEl && helicalDriftEl) helicalDriftLabelEl.textContent = `${parseInt(helicalDriftEl.value||'0',10)}°`;
     if (helicalSmoothLabelEl && helicalSmoothEl) helicalSmoothLabelEl.textContent = String(parseInt(helicalSmoothEl.value||'0',10));
+
+    // Ring Field controls also require Slice Engine perimeter samples.
+    const canRingField = canHelical;
+    document.querySelectorAll('#ringFieldView,#ringFieldCenter,#ringFieldSignal,#ringFieldBins,#ringFieldSeam,#ringFieldSmooth,#ringFieldNormalize,#exportRingFieldPNG,#exportRingFieldCSV').forEach(el=>{ if(el) el.disabled = !canRingField; });
+    if (ringFieldSeamLabelEl && ringFieldSeamEl) ringFieldSeamLabelEl.textContent = `${parseInt(ringFieldSeamEl.value||'0',10)}°`;
+    if (ringFieldSmoothLabelEl && ringFieldSmoothEl) ringFieldSmoothLabelEl.textContent = String(parseInt(ringFieldSmoothEl.value||'0',10));
 
     // Axis perturbation stress-test controls
     [axisStressBaseEl, axisStressMaxEl, axisStressStepEl, axisStressAzEl, axisStressRunBtn, axisStressUseSliceEl, axisStressGlobalTooEl, axisStressAudioEl].forEach(el=>{ if(el) el.disabled = !anyActive; });
@@ -5270,45 +5566,19 @@ function renderCards(runs){
   }
 
   function showdownFixedVsFit(){
-    const run = getActiveRun();
-    if (!run || !run.res) return;
-    const base = run.res;
-    const zArr = base.z;
-    const rArr = base.r50;
-    if (!zArr || !rArr) return;
-
-    // Fit search using current scaffold-step range inputs
-    const kMin = parseFloat(kMinEl.value);
-    const kMax = parseFloat(kMaxEl.value);
-    const kStep = parseFloat(kStepEl.value);
-    const fitRes = analyzeFromR50(zArr, rArr, {
-      fitMode: "fit",
-      kMin, kMax, kStep,
-      bandTol: base.bandTol,
-      smoothWin: base.smoothWin,
-    });
-    const fixedRes = analyzeFromR50(zArr, rArr, {
-      fitMode: "fixed",
-      kFixed: 1.22474487139,
-      bandTol: base.bandTol,
-      smoothWin: base.smoothWin,
-    });
-
-    const sFit = scoreCandidate(fitRes);
-    const sFix = scoreCandidate(fixedRes);
-    const win = (sFit>sFix) ? "best-fit" : "fixed √6/2";
-    const n1 = guardrailNotes(fixedRes);
-    const n2 = guardrailNotes(fitRes);
-    scoutOut.innerHTML = `
-      <div class="small"><b>Showdown</b> — winner: <b>${win}</b></div>
-      <div class="small" style="margin-top:6px">
-        <b>fixed √6/2</b>: step=${fmt(fixedRes.k,6)} purity=${fmt(fixedRes.purity,2)}% medAbs=${fmt(fixedRes.medianAbs,4)} trans=${fixedRes.transitions} ${n1?`<span class="small">(${n1})</span>`:""}
-      </div>
-      <div class="small" style="margin-top:4px">
-        <b>best-fit (grid)</b>: step=${fmt(fitRes.k,6)} purity=${fmt(fitRes.purity,2)}% medAbs=${fmt(fitRes.medianAbs,4)} trans=${fitRes.transitions} ${n2?`<span class="small">(${n2})</span>`:""}
-      </div>
-      <div class="small" style="margin-top:6px">Interpretation: if the reference √6/2 corridor stays competitive across axes + Evidence Check, that is a reason to investigate a real corridor-family signal rather than treating the result as a single-axis overfit.</div>
-    `;
+    const run=getActiveRun();
+    if(!run?.res?.z?.length || !run?.res?.r50?.length) return;
+    const currentRange={kMin:parseFloat(kMinEl.value),kMax:parseFloat(kMaxEl.value),kStep:parseFloat(kStepEl.value)};
+    const broadRange={kMin:1.025,kMax:2.500,kStep:Math.max(0.003,Number(currentRange.kStep)||0.003)};
+    const current=analyzeFromR50(run.res.z,run.res.r50,{fitMode:'fit',fitRange:currentRange});
+    const broad=analyzeFromR50(run.res.z,run.res.r50,{fitMode:'fit',fitRange:broadRange});
+    const drift=Math.abs(Math.log(Math.max(1e-12,current.k)/Math.max(1e-12,broad.k)));
+    const stable=drift<0.015;
+    scoutOut.innerHTML=`
+      <div class="small"><b>Search-domain audit</b> — ${stable?'<span class="good">stable candidate</span>':'<span class="warn">domain-sensitive candidate</span>'}</div>
+      <div class="small" style="margin-top:6px"><b>declared domain</b> ${currentRange.kMin.toFixed(3)}–${currentRange.kMax.toFixed(3)} → step ${current.k.toFixed(6)}, purity ${(current.snapPurity*100).toFixed(2)}%, median residual ${current.medianAbs.toFixed(5)}</div>
+      <div class="small" style="margin-top:4px"><b>broad audit</b> ${broadRange.kMin.toFixed(3)}–${broadRange.kMax.toFixed(3)} → step ${broad.k.toFixed(6)}, purity ${(broad.snapPurity*100).toFixed(2)}%, median residual ${broad.medianAbs.toFixed(5)}</div>
+      <div class="small" style="margin-top:6px">log-step drift ${drift.toFixed(5)}. A candidate that moves materially when the domain expands should be treated as search-dependent, not as an intrinsic object property.</div>`;
   }
 
   function pickColor(i){
@@ -5579,7 +5849,7 @@ function renderCards(runs){
           log("Mesh cache hit: reused parsed triangles (no FileReader pass).");
         }
 
-        const mode = fitMode.value || "fixed";
+        const mode = fitMode.value || "fit";
         const meas = measureMode.value || "vertex";
 
         if (isRunFresh(run)){
@@ -5588,7 +5858,7 @@ function renderCards(runs){
           clearStale();
         } else {
           reportProgress("Analyzing geometry", i+1, runs.length, `${meas === "slice" ? "Slice Engine" : "Vertex bins"} + ${mode === "piecewise" ? "segmented scaffold" : "scaffold"}`, {fileIndex:i+1, fileTotal:runs.length, fileName: run.name, axis: (axisMode ? axisMode.value : "z").toUpperCase()});
-          log("Computing: envelope (median width), bands, texture score…");
+          log("Computing: envelope (median radial distance), bands, texture score…");
           if (meas === "slice") log("Using Slice Engine: triangle-plane intersections + smoothed centerline.");
 
           const res = await analyzeRunCached(run, {fitMode: mode, measureMode: meas, axisMode: axisMode ? axisMode.value : "z", centerLockGlobal: !!(centerLock && centerLock.checked), cacheId: run.id});
@@ -5710,7 +5980,7 @@ function renderCards(runs){
     if (run.xyz && run.xyz._sig === xyzSigNow) return;
 
     // Compute three axes fingerprints using current mode/measurer.
-    const mode = fitMode.value || "fixed";
+    const mode = fitMode.value || "fit";
     const meas = measureMode.value || "vertex";
     if (piecewiseRow) piecewiseRow.style.display = (mode==="piecewise") ? "flex" : "none";
     const baseOpts = {fitMode: mode, measureMode: meas, centerLockGlobal: !!(centerLock && centerLock.checked)};
@@ -6233,6 +6503,132 @@ function drawXYZBarcode(run){
     downloadBlob(new Blob([rows.join("\n")], {type:"text/csv"}), name);
   }
   // -----------------------------
+  // Ring Field — circumferential unwrap / stacked slice field v5.2.33
+  // Downstream only: reads Slice Engine perimeter points and never changes measurement math.
+  // -----------------------------
+  function circularSmoothArray(arr, radius){
+    const n=arr.length, r=Math.max(0,Math.floor(Number(radius)||0));
+    if(!r || !n) return arr.slice();
+    const out=new Array(n).fill(NaN);
+    for(let i=0;i<n;i++){
+      let s=0,c=0;
+      for(let d=-r;d<=r;d++){
+        const v=arr[(i+d+n)%n];
+        if(isFinite(v)){s+=v;c++;}
+      }
+      out[i]=c?s/c:NaN;
+    }
+    return out;
+  }
+  function ringFieldLineFit(z, vals){
+    const n=Math.min(z.length,vals.length); if(!n) return {m:0,b:0};
+    let sx=0,sy=0,sxx=0,sxy=0,c=0;
+    for(let i=0;i<n;i++){const x=Number(z[i]),y=Number(vals[i]);if(!isFinite(x)||!isFinite(y))continue;sx+=x;sy+=y;sxx+=x*x;sxy+=x*y;c++;}
+    const den=c*sxx-sx*sx; const m=Math.abs(den)>1e-12?(c*sxy-sx*sy)/den:0; return {m,b:c?(sy-m*sx)/c:0};
+  }
+  function ringFieldCenterForSlice(res, si, mode){
+    const cl=res.measure?.centerline || {}, rawX=cl.cxRaw||cl.cx||[], rawY=cl.cyRaw||cl.cy||[], smX=cl.cx||rawX, smY=cl.cy||rawY;
+    if(mode==='axis') return [0,0];
+    if(mode==='global'){
+      const xs=smX.filter(isFinite), ys=smY.filter(isFinite);
+      return [xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:0, ys.length?ys.reduce((a,b)=>a+b,0)/ys.length:0];
+    }
+    if(mode==='straightAxis'){
+      const z=res.z||[]; const fx=ringFieldLineFit(z,rawX), fy=ringFieldLineFit(z,rawY), zz=Number(z[si]??0);
+      return [fx.m*zz+fx.b,fy.m*zz+fy.b];
+    }
+    if(mode==='localRaw') return [isFinite(rawX[si])?rawX[si]:0,isFinite(rawY[si])?rawY[si]:0];
+    return [isFinite(smX[si])?smX[si]:0,isFinite(smY[si])?smY[si]:0];
+  }
+  function rotateRingRow(row, shift){const n=row.length,out=new Array(n);for(let i=0;i<n;i++)out[i]=row[(i+shift+n)%n];return out;}
+  function bestCircularShift(prev,row){
+    const n=row.length; let best=0,bestScore=-Infinity;
+    for(let sh=0;sh<n;sh++){let s=0,c=0;for(let i=0;i<n;i++){const a=prev[i],b=row[(i+sh)%n];if(isFinite(a)&&isFinite(b)){s+=a*b;c++;}}const score=c?s/c:-Infinity;if(score>bestScore){bestScore=score;best=sh;}}
+    return best;
+  }
+  function fitCircleKasa(samples){
+    if(!samples || samples.length<3) return null;
+    let suu=0,suv=0,svv=0,su=0,sv=0,suuu=0,svvv=0,suvv=0,svuu=0,n=0;
+    for(const p of samples){const u=Number(p.u),v=Number(p.v);if(!isFinite(u)||!isFinite(v))continue;const uu=u*u,vv=v*v;suu+=uu;suv+=u*v;svv+=vv;su+=u;sv+=v;suuu+=uu*u;svvv+=vv*v;suvv+=u*vv;svuu+=v*uu;n++;}
+    if(n<3)return null;
+    const A=2*(suu-su*su/n), B=2*(suv-su*sv/n), C=2*(svv-sv*sv/n);
+    const D=suuu+suvv-(suu+svv)*su/n, E=svvv+svuu-(suu+svv)*sv/n;
+    const det=A*C-B*B;if(Math.abs(det)<1e-12)return null;
+    const cx=(D*C-B*E)/det, cy=(A*E-B*D)/det;
+    const rs=samples.map(p=>Math.hypot(p.u-cx,p.v-cy)).filter(isFinite);const radius=rs.length?rs.reduce((a,b)=>a+b,0)/rs.length:0;
+    return {cx,cy,radius};
+  }
+  function computeRingField(res){
+    const ptsBySlice=res?.measure?.slicePts;
+    if(!ptsBySlice || !ptsBySlice.length) return {ok:false,reason:'Ring Field requires Slice Engine perimeter samples.'};
+    const bins=Math.max(24,parseInt(ringFieldBinsEl?.value||'120',10));
+    const seam=(parseFloat(ringFieldSeamEl?.value||'0')||0)*Math.PI/180;
+    const smooth=parseInt(ringFieldSmoothEl?.value||'0',10)||0;
+    const centerMode=String(ringFieldCenterEl?.value||'local');
+    const signalMode=String(ringFieldSignalEl?.value||'mean');
+    const alignMode=String(ringFieldAlignEl?.value||'manual');
+    const normalize=!!ringFieldNormalizeEl?.checked, fillMissing=ringFieldFillMissingEl?!!ringFieldFillMissingEl.checked:true;
+    let rows=[], circumferences=[], coverages=[], ridgePath=[], maxAbs=0;
+    for(let si=0;si<ptsBySlice.length;si++){
+      const pts=ptsBySlice[si]||[], c=ringFieldCenterForSlice(res,si,centerMode), samples=[];
+      for(let i=0;i<pts.length;i+=2){const du=pts[i]-c[0],dv=pts[i+1]-c[1],r=Math.hypot(du,dv);let a=Math.atan2(dv,du)-seam;a=((a%(2*Math.PI))+2*Math.PI)%(2*Math.PI);samples.push({a,r,u:pts[i],v:pts[i+1]});}
+      samples.sort((a,b)=>a.a-b.a);
+      let circ=0; for(let i=1;i<samples.length;i++)circ+=Math.hypot(samples[i].u-samples[i-1].u,samples[i].v-samples[i-1].v); if(samples.length>2)circ+=Math.hypot(samples[0].u-samples.at(-1).u,samples[0].v-samples.at(-1).v);
+      circumferences.push(circ);
+      const sums=new Array(bins).fill(0),counts=new Array(bins).fill(0);
+      for(const q of samples){const bi=Math.min(bins-1,Math.floor(q.a/(2*Math.PI)*bins));sums[bi]+=q.r;counts[bi]++;}
+      let row=sums.map((v,i)=>counts[i]?v/counts[i]:NaN); coverages.push(counts.filter(Boolean).length/bins);
+      if(fillMissing){for(let i=0;i<bins;i++)if(!isFinite(row[i])){for(let d=1;d<bins;d++){const a=row[(i-d+bins)%bins],b=row[(i+d)%bins];if(isFinite(a)||isFinite(b)){row[i]=isFinite(a)&&isFinite(b)?(a+b)/2:(isFinite(a)?a:b);break;}}}}
+      const finite=row.filter(isFinite), mean=finite.length?finite.reduce((a,b)=>a+b,0)/finite.length:0, med=finite.length?median(finite):0;
+      const sd=Math.sqrt(finite.reduce((a,v)=>a+(v-mean)*(v-mean),0)/Math.max(1,finite.length-1))||1;
+      if(signalMode==='circleResidual'){
+        const circle=fitCircleKasa(samples);
+        if(circle){
+          const rsums=new Array(bins).fill(0), rcounts=new Array(bins).fill(0);
+          for(const q of samples){const bi=Math.min(bins-1,Math.floor(q.a/(2*Math.PI)*bins));rsums[bi]+=Math.hypot(q.u-circle.cx,q.v-circle.cy)-circle.radius;rcounts[bi]++;}
+          row=rsums.map((v,i)=>rcounts[i]?v/rcounts[i]:NaN);
+          if(fillMissing){for(let i=0;i<bins;i++)if(!isFinite(row[i])){for(let d=1;d<bins;d++){const a=row[(i-d+bins)%bins],b=row[(i+d)%bins];if(isFinite(a)||isFinite(b)){row[i]=isFinite(a)&&isFinite(b)?(a+b)/2:(isFinite(a)?a:b);break;}}}}
+        } else row=row.map(v=>isFinite(v)?v-mean:NaN);
+      } else {
+        row=row.map(v=>!isFinite(v)?NaN:signalMode==='radius'?v:signalMode==='median'?v-med:signalMode==='percent'?(mean?((v/mean)-1):0):signalMode==='standard'?(v-mean)/sd:v-mean);
+      }
+      row=circularSmoothArray(row,smooth);
+      if(normalize){const a=Math.max(...row.filter(isFinite).map(Math.abs),1e-12);row=row.map(v=>isFinite(v)?v/a:NaN);}
+      rows.push(row);
+    }
+    if(alignMode==='ridge') rows=rows.map(row=>{let ri=0,rv=-Infinity;row.forEach((v,i)=>{if(isFinite(v)&&v>rv){rv=v;ri=i;}});return rotateRingRow(row,ri);});
+    else if(alignMode==='propagate' && rows.length){const out=[rows[0]];for(let i=1;i<rows.length;i++){const sh=bestCircularShift(out[i-1],rows[i]);out.push(rotateRingRow(rows[i],sh));}rows=out;}
+    rows.forEach(row=>{let ri=0,rv=-Infinity;row.forEach((v,i)=>{if(isFinite(v)){maxAbs=Math.max(maxAbs,Math.abs(v));if(v>rv){rv=v;ri=i;}}});ridgePath.push(ri);});
+    let ridgeTravel=0;for(let i=1;i<ridgePath.length;i++){const d=Math.abs(ridgePath[i]-ridgePath[i-1]);ridgeTravel+=Math.min(d,bins-d);}ridgeTravel/=Math.max(1,ridgePath.length-1);
+    const maxCirc=Math.max(...circumferences.filter(isFinite),1), meanCoverage=coverages.length?coverages.reduce((a,b)=>a+b,0)/coverages.length:0;
+    return {ok:true,rows,bins,seamDeg:seam*180/Math.PI,smooth,centerMode,signalMode,alignMode,normalize,fillMissing,maxAbs:maxAbs||1,coverage:meanCoverage,ridgePath,ridgeTravel,circumferences,maxCirc};
+  }
+  function ringFieldColor(v,maxAbs){if(!isFinite(v))return 'rgba(245,245,245,.75)';const t=clamp(v/(maxAbs||1),-1,1);if(t>=0){const q=Math.round(255*(1-t));return `rgb(${q},${q},255)`;}const q=Math.round(255*(1+t));return `rgb(255,${q},${q})`;}
+  function drawRingPanel(g,rf,box,view,physical){
+    const {x,y,w,h}=box,rows=rf.rows,bins=rf.bins;g.fillStyle='#fff';g.fillRect(x,y,w,h);g.strokeStyle='#bbb';g.strokeRect(x,y,w,h);
+    const heat=view.includes('heatmap')||view==='ridges';
+    if(heat){const ch=h/Math.max(1,rows.length);rows.forEach((row,si)=>{const frac=physical?(rf.circumferences[si]/rf.maxCirc):1;const rowW=w*frac,rowX=x+(w-rowW)/2,cw=rowW/bins;row.forEach((v,bi)=>{let amp=view==='ridges'?(bi===rf.ridgePath[si]?rf.maxAbs:0):v;g.fillStyle=ringFieldColor(amp,rf.maxAbs);g.fillRect(rowX+bi*cw,y+(rows.length-1-si)*ch,Math.ceil(cw)+.3,Math.ceil(ch)+.3);});});}
+    else{const rowStep=h/Math.max(1,rows.length-1),ampScale=Math.min(rowStep*2.8,26)/(rf.maxAbs||1);g.strokeStyle='rgba(15,35,65,.42)';g.lineWidth=.8;rows.forEach((row,si)=>{const frac=physical?(rf.circumferences[si]/rf.maxCirc):1,rowW=w*frac,rowX=x+(w-rowW)/2,y0=y+h-si*rowStep;g.beginPath();row.forEach((v,bi)=>{if(!isFinite(v))return;const xx=rowX+bi/Math.max(1,bins-1)*rowW,yy=y0-v*ampScale;if(bi===0)g.moveTo(xx,yy);else g.lineTo(xx,yy);});g.stroke();});}
+    g.strokeStyle='rgba(0,0,0,.15)';g.setLineDash([4,4]);g.beginPath();g.moveTo(x+w/2,y);g.lineTo(x+w/2,y+h);g.stroke();g.setLineDash([]);
+  }
+  function drawRingField(){
+    if(!ringFieldCanvas)return;const g=clearCanvas(ringFieldCanvas),w=ringFieldCanvas.width,h=ringFieldCanvas.height,padL=58,padR=18,padT=34,padB=46;g.fillStyle='#fff';g.fillRect(0,0,w,h);
+    const run=getActiveRun(),res=run?.res;if(!res){g.fillStyle='#666';g.fillText('Analyze an STL to build the Ring Field.',18,28);return;}const rf=computeRingField(res);if(!rf.ok){g.fillStyle='#666';g.fillText(rf.reason,18,28);if(ringFieldOut)ringFieldOut.textContent=rf.reason;return;}
+    const view=String(ringFieldViewEl?.value||'heatmap'),pw=w-padL-padR,ph=h-padT-padB;
+    if(view==='split'){const gap=18,half=(pw-gap)/2;drawRingPanel(g,rf,{x:padL,y:padT,w:half,h:ph},'heatmap',false);drawRingPanel(g,rf,{x:padL+half+gap,y:padT,w:half,h:ph},'heatmap',true);g.fillStyle='#333';g.font='12px system-ui';g.fillText('ANGULAR 0–360° (equal width)',padL,padT-10);g.fillText('TRUE PERIMETER LENGTH (centered)',padL+half+gap,padT-10);}
+    else{const physical=view.startsWith('physical');const kind=view==='physicalHeatmap'?'heatmap':view==='physicalTraces'?'traces':view;drawRingPanel(g,rf,{x:padL,y:padT,w:pw,h:ph},kind,physical);g.fillStyle='#333';g.font='12px system-ui';g.fillText(physical?'true cumulative perimeter length — centered':'angular circumference 0–360°',padL,padT-10);}
+    g.fillStyle='#444';g.font='12px system-ui';g.fillText('base',8,padT+ph);g.fillText('top',12,padT+10);g.fillText(`reference ${rf.centerMode} · alignment ${rf.alignMode} · seam ${Math.round(rf.seamDeg)}°`,padL,h-8);
+    if(ringFieldOut)ringFieldOut.innerHTML=`reference ${rf.centerMode} · signal ${rf.signalMode} · alignment ${rf.alignMode} · bins ${rf.bins} · observed angular coverage ${(rf.coverage*100).toFixed(1)}% · perimeter range ${Math.min(...rf.circumferences).toPrecision(4)}–${rf.maxCirc.toPrecision(4)} model units · ridge travel ${rf.ridgeTravel.toFixed(2)} bins/slice · amplitude ${rf.normalize?'slice-normalized':rf.maxAbs.toPrecision(4)}<br>Angular view preserves correspondence; physical view preserves cumulative perimeter length and real blank background. Compare both before interpreting orthogonal ridges, valleys, diagonals, helices, or cross-hatching.`;
+    run._ringField=rf;
+  }
+  function exportRingFieldCSV(){
+    const run=getActiveRun(), rf=run?.res?computeRingField(run.res):null;if(!rf?.ok)return;
+    const rows=[['slice_phase','angle_deg','value','ridge_bin','perimeter_length','center_reference','alignment'].join(',')];
+    rf.rows.forEach((row,si)=>row.forEach((v,bi)=>rows.push([run.res.z?.[si]??si/Math.max(1,rf.rows.length-1),bi*360/rf.bins,v,rf.ridgePath[si],rf.circumferences[si],rf.centerMode,rf.alignMode].map(csvCell).join(','))));
+    downloadBlob(new Blob([rows.join('\n')],{type:'text/csv'}),`${(run.name||'flex').replace(/\.[^.]+$/,'')}_ring_field.csv`);
+  }
+
+  // -----------------------------
   // Geometry Music Lab — additive WebAudio sonification v5.2.13
   // Additive only: reads derivativeGrammar / XYZ coherence outputs and never changes analysis math.
   // -----------------------------
@@ -6557,6 +6953,7 @@ function drawXYZBarcode(run){
     const trace = computeHelicalNeedleTrace(res);
     if(!trace.ok){ musicSetStatus(trace.reason || "Helical trace unavailable."); return; }
     drawHelicalNeedleLab(trace);
+    drawRingField();
     const base = musicBase(), span = musicSpan()+4, ms = Math.max(38, musicSpeedMs()*0.42);
     const pts=[];
     const step=Math.max(1, Math.floor(trace.signal.length/96));
@@ -6584,6 +6981,98 @@ function drawXYZBarcode(run){
     }, ()=>musicSetStatus("Helical / Hilo needle traversal complete."), 120);
   }
 
+  function cfMusicDensityProfile(){
+    const v=String(cfMusicDensityEl?.value||"normal");
+    if(v==="light") return {slices:12,angles:8,ridge:36};
+    if(v==="dense") return {slices:30,angles:20,ridge:96};
+    return {slices:20,angles:12,ridge:60};
+  }
+  function getCFMusicField(res){
+    const rf=computeRingField(res);
+    if(!rf?.ok) return rf;
+    const z=res.z||[];
+    const selected=[];
+    for(let i=0;i<rf.rows.length;i++){
+      const phase=isFinite(z[i])?Number(z[i]):i/Math.max(1,rf.rows.length-1);
+      if(inPhaseWindow(phase)) selected.push({si:i,phase,row:rf.rows[i],ridge:rf.ridgePath[i]||0});
+    }
+    return {...rf,selected};
+  }
+  function cfValueRatio(v,rf,boost=0.20){
+    if(!isFinite(v)) return 1;
+    const norm=clamp(v/Math.max(1e-12,rf.maxAbs||1),-1,1);
+    return Math.exp(norm*boost);
+  }
+  function cfAnglePitchRatio(angleFrac){
+    if(!(cfMusicAngleToneEl?.checked)) return 1;
+    return Math.pow(2,(angleFrac-0.5)*0.48);
+  }
+  function playCFOrbit(res){
+    const rf=getCFMusicField(res);
+    if(!rf?.ok){musicSetStatus(rf?.reason||"Angular Radial Field unavailable. Use Slice Engine first.");return;}
+    const prof=cfMusicDensityProfile(), base=musicBase(), span=musicSpan();
+    const stride=Math.max(1,Math.floor(rf.selected.length/prof.slices));
+    const slices=applyTraversal(rf.selected.filter((_,i)=>i%stride===0).slice(0,prof.slices));
+    const ms=Math.max(300,musicSpeedMs()+220);
+    musicPlayback.active=true;musicPlayback.mode="cfOrbit";updateUI();
+    musicSetStatus(`Ring orbit: ${slices.length} circumferential slices. Each slice sweeps around 0–360° using the current Angular Radial Field settings.`);
+    scheduleSequence(slices,ms,(sl,idx,pass)=>{
+      flashSliceAtPhase(sl.phase);
+      const row=sl.row||[], step=Math.max(1,Math.floor(row.length/prof.angles));
+      let toneIndex=0;
+      for(let bi=0;bi<row.length;bi+=step){
+        const v=row[bi];if(!isFinite(v))continue;
+        const af=bi/Math.max(1,row.length);
+        const ratio=cfValueRatio(v,rf,0.24)*cfAnglePitchRatio(af);
+        const when=toneIndex*Math.max(0.018,(ms/1000)/(prof.angles+3));
+        playMusicTone(ratioToFreq(ratio,base,Math.max(8,span*0.55)),when,Math.max(.045,ms/1000/prof.angles*1.8),clamp(.018+Math.abs(v/rf.maxAbs)*.035,.014,.055),musicWave(),Math.sin(af*Math.PI*2)*.85);
+        toneIndex++;
+      }
+      if(musicCenterToneEl?.checked)playMusicTone(base,0,Math.max(.12,ms/1000*.65),.010,"sine",0);
+      musicSetStatus(`Ring orbit pass ${pass+1}/${getPassCount()} · slice ${idx+1}/${slices.length} · phase ${sl.phase.toFixed(3)} · ${toneIndex} angular tones.`);
+    },()=>musicSetStatus("Ring Field orbit complete."),120);
+  }
+  function playCFChords(res){
+    const rf=getCFMusicField(res);
+    if(!rf?.ok){musicSetStatus(rf?.reason||"Angular Radial Field unavailable. Use Slice Engine first.");return;}
+    const prof=cfMusicDensityProfile(),base=musicBase(),span=musicSpan(),stride=Math.max(1,Math.floor(rf.selected.length/prof.slices));
+    const slices=applyTraversal(rf.selected.filter((_,i)=>i%stride===0).slice(0,prof.slices));
+    const ms=Math.max(280,musicSpeedMs()+180);
+    musicPlayback.active=true;musicPlayback.mode="cfChords";updateUI();
+    musicSetStatus(`Ring chords: ${slices.length} slices. Four angular quadrants become a chord, exposing circumferential balance and asymmetry through height.`);
+    scheduleSequence(slices,ms,(sl,idx,pass)=>{
+      flashSliceAtPhase(sl.phase);
+      const row=sl.row||[],q=[];
+      for(let qi=0;qi<4;qi++){
+        const a=Math.floor(qi*row.length/4),b=Math.floor((qi+1)*row.length/4),vals=row.slice(a,b).filter(isFinite);
+        q.push(vals.length?vals.reduce((x,y)=>x+y,0)/vals.length:0);
+      }
+      q.forEach((v,qi)=>{
+        const af=(qi+.5)/4,ratio=cfValueRatio(v,rf,.25)*cfAnglePitchRatio(af);
+        playMusicTone(ratioToFreq(ratio,base,Math.max(8,span*.65)),qi*.012,Math.max(.18,ms/1000*.72),clamp(.022+Math.abs(v/rf.maxAbs)*.035,.018,.060),qi%2?"triangle":"sine",[-.78,-.28,.28,.78][qi]);
+      });
+      if(musicCenterToneEl?.checked)playMusicTone(base,.025,Math.max(.14,ms/1000*.60),.012,"sine",0);
+      musicSetStatus(`Ring chord pass ${pass+1}/${getPassCount()} · slice ${idx+1}/${slices.length} · phase ${sl.phase.toFixed(3)} · quadrant field ${q.map(v=>(v/rf.maxAbs).toFixed(2)).join(" / ")}.`);
+    },()=>musicSetStatus("Ring Field quadrant-chord scan complete."));
+  }
+  function playCFRidge(res){
+    const rf=getCFMusicField(res);
+    if(!rf?.ok){musicSetStatus(rf?.reason||"Angular Radial Field unavailable. Use Slice Engine first.");return;}
+    const prof=cfMusicDensityProfile(),base=musicBase(),span=musicSpan(),stride=Math.max(1,Math.floor(rf.selected.length/prof.ridge));
+    const pts=applyTraversal(rf.selected.filter((_,i)=>i%stride===0).slice(0,prof.ridge));
+    const ms=Math.max(55,musicSpeedMs()*.55);
+    musicPlayback.active=true;musicPlayback.mode="cfRidge";updateUI();
+    musicSetStatus(`Ridge path: ${pts.length} strongest outward angular events. Pitch follows radial strength; stereo follows angle around the object.`);
+    scheduleSequence(pts,ms,(sl,idx,pass)=>{
+      flashSliceAtPhase(sl.phase);
+      const bi=clamp(sl.ridge||0,0,Math.max(0,sl.row.length-1)),v=sl.row[bi]||0,af=bi/Math.max(1,sl.row.length);
+      const ratio=cfValueRatio(v,rf,.30)*cfAnglePitchRatio(af),pan=Math.sin(af*Math.PI*2)*.92;
+      playMusicTone(ratioToFreq(ratio,base,Math.max(10,span*.7)),0,Math.max(.045,ms/1000*.86),clamp(.020+Math.abs(v/rf.maxAbs)*.050,.018,.074),musicWave(),pan);
+      if(musicCenterToneEl?.checked&&idx%4===0)playMusicTone(base,.006,Math.max(.04,ms/1000*.58),.008,"triangle",-pan*.2);
+      musicSetStatus(`Ridge pass ${pass+1}/${getPassCount()} · ${idx+1}/${pts.length} · phase ${sl.phase.toFixed(3)} · angle ${(af*360).toFixed(0)}° · strength ${(v/rf.maxAbs).toFixed(3)}.`);
+    },()=>musicSetStatus("Ring Field ridge traversal complete."),90);
+  }
+
   function playGeometryMusic(){
     const run = getActiveRun();
     if(!run || !run.res){ musicSetStatus("Analyze an STL first, then Play Geometry."); return; }
@@ -6594,6 +7083,9 @@ function drawXYZBarcode(run){
     else if(mode==="xyz") playXYZChords(run);
     else if(mode==="closures") playClosureOnly(run);
     else if(mode==="helical") playHelicalNeedle(run.res);
+    else if(mode==="cfOrbit") playCFOrbit(run.res);
+    else if(mode==="cfChords") playCFChords(run.res);
+    else if(mode==="cfRidge") playCFRidge(run.res);
     else playReciprocalPairs(run.res);
   }
   function applySoundboardPreset(name){
@@ -6612,6 +7104,7 @@ function drawXYZBarcode(run){
       if(helicalReferenceEl) helicalReferenceEl.value="scaffold";
       if(helicalSignalModeEl) helicalSignalModeEl.value="logratio";
       drawHelicalNeedleLab();
+    drawRingField();
       musicSetStatus("Soundboard: Helical / Hilo needle family loaded. Tune turns/phase/reference, or press Auto-tune helix, then Play Geometry to trace the object like a groove.");
     } else if(name==="reciprocal"){
       if(musicModeEl) musicModeEl.value="reciprocal";
@@ -6693,6 +7186,26 @@ function drawXYZBarcode(run){
       if(helicalSmoothEl) helicalSmoothEl.value="1";
       drawHelicalNeedleLab(); refreshViewer();
       musicSetStatus("Edge chatter: compares the needle against the outer envelope R90. Good for lugs, legs, handles, and carved interruptions.");
+    } else if(name==="cfOrbit"){
+      if(musicModeEl) musicModeEl.value="cfOrbit";
+      if(musicTraversalEl) musicTraversalEl.value="forward";
+      if(musicWaveEl) musicWaveEl.value="sine";
+      if(musicScaleEl) musicScaleEl.value="none";
+      if(musicSpanEl){musicSpanEl.value="18";if(musicSpanLabelEl)musicSpanLabelEl.textContent="18";}
+      musicSetStatus("Ring Field orbit loaded: each selected slice sweeps around its full angular radial field using the current Ring Field settings.");
+    } else if(name==="cfChords"){
+      if(musicModeEl) musicModeEl.value="cfChords";
+      if(musicTraversalEl) musicTraversalEl.value="forward";
+      if(musicWaveEl) musicWaveEl.value="triangle";
+      if(musicScaleEl) musicScaleEl.value="none";
+      musicSetStatus("Ring Field chords loaded: four angular quadrants sound together at each height to expose balance, asymmetry, and changing participation.");
+    } else if(name==="cfRidge"){
+      if(musicModeEl) musicModeEl.value="cfRidge";
+      if(musicTraversalEl) musicTraversalEl.value="forward";
+      if(musicWaveEl) musicWaveEl.value="sine";
+      if(musicSpeedEl) musicSpeedEl.value="fast";
+      if(musicScaleEl) musicScaleEl.value="none";
+      musicSetStatus("Ring Field ridge loaded: strongest outward angular event travels through height; stereo position follows angle around the form.");
     }
     updateUI();
   }
@@ -6759,6 +7272,7 @@ function drawXYZBarcode(run){
       viewerInfo.textContent = "Pick a file with results to inspect.";
       updateRealScaleInfo(null);
       if (derivativeGrammarOut) derivativeGrammarOut.innerHTML = "No active analysis yet.";
+      renderPlatformLensReport();
       return;
     }
 
@@ -6777,6 +7291,7 @@ function drawXYZBarcode(run){
       musicSetStatus(`Ready: ${dg.steps?.length||0} step ratios, ${dg.rawTightRecips||0} raw tight reciprocal pairs. Choose a mode and press Play Geometry.`);
     }
     drawHelicalNeedleLab();
+    drawRingField();
 
     const analyzedRuns = runs.filter(r=>r.res);
     drawCompare(analyzedRuns.map(r=>({name:r.name, res:r.res, color:r.color, isActive:r.id===activeId})));
@@ -6807,11 +7322,13 @@ function drawXYZBarcode(run){
     metaOut.innerHTML = renderMetaHTML(res);
     xyzOut.innerHTML = renderXYZHTML(run);
     drawXYZBarcode(run);
+    renderPlatformLensReport();
     // Kick off XYZ computation if enabled (non-blocking)
     ensureXYZ(run).then(()=>{
       if (getActiveRun() && getActiveRun().id===run.id){
         xyzOut.innerHTML = renderXYZHTML(run);
         drawXYZBarcode(run);
+        renderPlatformLensReport();
         buildViewer(run); // refresh viewer for XYZ convergence mode if selected
       }
     });
@@ -6837,7 +7354,7 @@ function drawXYZBarcode(run){
 
     const trials = clamp(parseInt(stabTrialsEl.value||"60",10), 10, 500);
     const ks=[], pur=[], medAbs=[];
-    const mode = fitMode.value || "fixed";
+    const mode = fitMode.value || "fit";
     const meas = measureMode.value || "vertex";
     if (piecewiseRow) piecewiseRow.style.display = (mode==="piecewise") ? "flex" : "none";
 
@@ -6910,7 +7427,7 @@ function drawXYZBarcode(run){
     log("ELI5: keep the big shape, scramble the small wiggles. If the same k/purity happens often, it’s likely a mirage.");
 
     // Choose how the null test treats k
-    // fixed: hold k constant (default √6/2)
+    // fixed: hold the active fitted step constant
     // free : refit the scaffold step for each null draw (more permissive / easier for nulls to look good)
     const modeUI = (nullModeEl && nullModeEl.value) ? nullModeEl.value : "fixed";
     const isPiecewise = (fitMode.value === "piecewise");
@@ -6919,7 +7436,7 @@ function drawXYZBarcode(run){
 
     let realEval;
     if (isPiecewise){
-      // For piecewise mode, "fixed" means each band uses √6/2, "free" means each band can fit its own k.
+      // For piecewise mode, fixed holds the active fitted step; free refits each segment.
       const pwMode = (modeUI === "free") ? "fit" : "fixed";
       realEval = await analyzePiecewiseFromR50(run.res.z, run.res.r50.slice(), {
         smoothWin: 0,
@@ -6931,7 +7448,7 @@ function drawXYZBarcode(run){
       });
     } else {
       const useActiveK = (fitMode.value === "fit");
-      const kFixed = useActiveK ? run.res.k : (Math.sqrt(6)/2);
+      const kFixed = run.res.k || neutralStepFromRange(fitRange);
       realEval = (modeUI === "free")
         ? analyzeFromR50(run.res.z, run.res.r50.slice(), {fitMode:"fit", fitRange})
         : analyzeFromR50(run.res.z, run.res.r50.slice(), {fitMode:"fixed", fitRange, kFixed});
@@ -6988,7 +7505,7 @@ function drawXYZBarcode(run){
       } else {
         // fixed: force the same k for every null draw (fairer)
         const useActiveK = (fitMode.value === "fit");
-        const kFixed = useActiveK ? run.res.k : (Math.sqrt(6)/2);
+        const kFixed = run.res.k || neutralStepFromRange(fitRange);
         fakeRes = analyzeFromR50(run.res.z, fake, {fitMode:"fixed", fitRange, kFixed});
       }
 
@@ -7798,6 +8315,10 @@ if (pointCountGL===0 && triCountGL===0){
   [helicalBinsEl, helicalSamplesEl, helicalReferenceEl, helicalSignalModeEl, helicalSearchMetricEl, helicalUseMusicWindowEl].forEach(el=>{ if(el) el.addEventListener("change", ()=>{ updateUI(); drawHelicalNeedleLab(); }); });
   if (helicalAutoScanBtn) helicalAutoScanBtn.addEventListener("click", autoTuneHelicalNeedle);
   if (exportHelicalCSVBtn) exportHelicalCSVBtn.addEventListener("click", exportHelicalCSV);
+  [ringFieldSeamEl,ringFieldSmoothEl].forEach(el=>{ if(el) el.addEventListener("input", ()=>{ updateUI(); drawRingField(); }); });
+  [ringFieldViewEl,ringFieldCenterEl,ringFieldSignalEl,ringFieldBinsEl,ringFieldNormalizeEl].forEach(el=>{ if(el) el.addEventListener("change", ()=>{ updateUI(); drawRingField(); }); });
+  if (exportRingFieldPNGBtn) exportRingFieldPNGBtn.addEventListener("click", ()=>canvasToPNG(ringFieldCanvas, `${(getActiveRun()?.name||'flex').replace(/\.[^.]+$/,'')}_ring_field.png`));
+  if (exportRingFieldCSVBtn) exportRingFieldCSVBtn.addEventListener("click", exportRingFieldCSV);
   if (evidenceCheckBtn){ evidenceCheckBtn.addEventListener("click", ()=> runEvidenceCheck()); }
   if (axisStressRunBtn){ axisStressRunBtn.addEventListener("click", ()=> runAxisStressTest()); }
 
@@ -7810,7 +8331,7 @@ if (pointCountGL===0 && triCountGL===0){
   async function reanalyzeActive(){
     const run = getActiveRun();
     if (!run || !run.parsed) return;
-    const mode = fitMode.value || "fixed";
+    const mode = fitMode.value || "fit";
     const meas = measureMode.value || "vertex";
     if (piecewiseRow) piecewiseRow.style.display = (mode==="piecewise") ? "flex" : "none";
     try{
@@ -7927,7 +8448,7 @@ if (pointCountGL===0 && triCountGL===0){
     const azCount = parseInt(axisStressAzEl?.value || '4',10);
     const forceSlice = !!(axisStressUseSliceEl && axisStressUseSliceEl.checked);
     const compareGlobal = !!(axisStressGlobalTooEl && axisStressGlobalTooEl.checked);
-    const mode = fitMode.value || 'fixed';
+    const mode = fitMode.value || 'fit';
     const meas = forceSlice ? 'slice' : (measureMode.value || 'slice');
     const baseCenterLock = !!(centerLock && centerLock.checked);
     const candidates = buildAxisStressCandidates(baseAxis, maxTilt, stepDeg, azCount);
@@ -8093,6 +8614,334 @@ if (pointCountGL===0 && triCountGL===0){
     const rec = res.reciprocal || computeReciprocalTraversal(res);
     return {res,dg,xc,cal,rec};
   }
+  function pct(v){ return `${(clamp(isFinite(v)?v:0,0,1)*100).toFixed(1)}%`; }
+  function metricCard(label, value, score=null){
+    const bar = score==null ? "" : `<div class="lensScoreBar"><i style="width:${(clamp(score,0,1)*100).toFixed(1)}%"></i></div>`;
+    return `<div class="lensMetric"><b>${escapeHtml(label)}</b><span>${escapeHtml(String(value))}</span>${bar}</div>`;
+  }
+  function measurementRecordNote(res){
+    const axis = String(res?.axis || "z").toUpperCase();
+    const measure = res?.measure?.mode || "vertex";
+    const fit = res?.fit?.mode || "fixed";
+    const center = res?.fixedCenter?.active ? "fixed centroid lens" : "local/floating slice centers";
+    return `Current record: ${measure} measurement on ${axis}, ${fit} fit, ${center}. Downstream lenses re-read this record; they do not rewrite it.`;
+  }
+  function platformLandmarks(res){
+    const bands = res?.bands || [];
+    const z = res?.zArr || [];
+    const r = res?.r50 || res?.rArr || res?.wArr || [];
+    const widths = bands.map(b=>isFinite(b.rawMedianWidth)?b.rawMedianWidth:b.rHat).filter(isFinite);
+    const zs = bands.map(b=>isFinite(b.zMid)?b.zMid:(isFinite(b.z0)&&isFinite(b.z1)?(b.z0+b.z1)/2:null)).filter(isFinite);
+    const maxWidth = widths.length ? Math.max(...widths) : (r.length ? Math.max(...r.filter(isFinite)) : NaN);
+    const minZ = z.length ? Math.min(...z.filter(isFinite)) : (zs.length ? Math.min(...zs) : 0);
+    const maxZ = z.length ? Math.max(...z.filter(isFinite)) : (zs.length ? Math.max(...zs) : 1);
+    const height = isFinite(maxZ-minZ) && maxZ>minZ ? maxZ-minZ : 1;
+    let bellyBand = 0, bellyWidth = maxWidth;
+    bands.forEach((b,i)=>{ const w=isFinite(b.rawMedianWidth)?b.rawMedianWidth:b.rHat; if(isFinite(w) && (!isFinite(bellyWidth) || w>=bellyWidth)){ bellyWidth=w; bellyBand=i; } });
+    const bellyZ = bands[bellyBand] ? ((bands[bellyBand].z0 + bands[bellyBand].z1)/2) : (minZ + height/2);
+    const topBand = bands[bands.length-1] || null, baseBand = bands[0] || null;
+    return {height, minZ, maxZ, maxWidth, bellyBand, bellyWidth, bellyZ, topBand, baseBand};
+  }
+  function candidateBaseUnits(run){
+    const res = run?.res; if(!res) return [];
+    const lm = platformLandmarks(res);
+    const bands = res.bands || [];
+    const vals = [];
+    function add(name, value, source, kind="landmark"){
+      if(isFinite(value) && value>0) vals.push({name, value, source, kind});
+    }
+    function bandWidth(b){ return b ? (isFinite(b.rawMedianWidth)?b.rawMedianWidth:b.rHat) : NaN; }
+    add("Total height", lm.height, "measured span", "span");
+    add("Maximum width", lm.maxWidth, "measured envelope", "width");
+    add("Belly diameter", lm.bellyWidth, "widest band", "width");
+    if(lm.topBand) add("Lip / top width", bandWidth(lm.topBand), "top band", "width");
+    if(bands.length>2){
+      const neck = bands.slice(Math.max(0,bands.length-4)).reduce((best,b)=>{
+        const w=bandWidth(b); const bw=best?bandWidth(best):Infinity; return w<bw?b:best;
+      }, null);
+      if(neck) add("Neck diameter", bandWidth(neck), "narrow upper band", "width");
+    }
+    if(lm.baseBand) add("Foot / base width", bandWidth(lm.baseBand), "base band", "width");
+    add("Centroid to lip", Math.abs(lm.maxZ - (lm.bellyZ || (lm.minZ+lm.height/2))), "landmark distance", "distance");
+    add("Centroid to belly", Math.abs((lm.bellyZ || 0) - (lm.minZ + lm.height/2)), "landmark distance", "distance");
+    add("Centroid to base", Math.abs((lm.minZ + lm.height/2) - lm.minZ), "landmark distance", "distance");
+    if(res.texture) add("Mean radius", res.texture.mean || res.texture.median, "radius summary", "radius");
+    add("Scaffold width", res.c || (bands[0] && bands[0].rHat), "derived scaffold scale", "derived");
+    if(res.k) add("Scaffold step", res.k, "derived fit", "derived");
+    const manual = parseFloat(document.getElementById("manualBUInput")?.value || "");
+    add("User-entered value", manual, "manual downstream value", "manual");
+
+    // Collapse equivalent BU values so the report explains duplicates instead of pretending
+    // maximum width and belly diameter are independent when they are numerically identical.
+    const groups = [];
+    const relTol = 1e-5;
+    for(const v of vals){
+      let g = groups.find(x=>Math.abs(x.value-v.value) <= Math.max(1e-9, Math.abs(v.value)*relTol));
+      if(!g){
+        g = {...v, aliases:[], sources:[v.source], kinds:new Set([v.kind])};
+        groups.push(g);
+      } else {
+        g.aliases.push({name:v.name, source:v.source, value:v.value, kind:v.kind});
+        if(!g.sources.includes(v.source)) g.sources.push(v.source);
+        g.kinds.add(v.kind);
+        // Prefer a readable physical landmark name as the display label.
+        const priority = {"Maximum width":1,"Belly diameter":2,"Foot / base width":3,"Lip / top width":4,"Neck diameter":5};
+        if((priority[v.name]||99) < (priority[g.name]||99)){
+          g.aliases.push({name:g.name, source:g.source, value:g.value, kind:g.kind});
+          g.name=v.name; g.source=v.source; g.value=v.value; g.kind=v.kind;
+        }
+      }
+    }
+    return groups.map(g=>({...g, aliasText:g.aliases.map(a=>a.name).join(", "), source:g.sources.join(" + "), kinds:Array.from(g.kinds)}));
+  }
+  function simpleConstantTargets(){
+    const rt=Math.sqrt, phi=(1+rt(5))/2;
+    return [
+      {name:"1",value:1},{name:"1/2",value:0.5},{name:"2/3",value:2/3},{name:"3/4",value:0.75},{name:"4/5",value:0.8},{name:"2/√6",value:2/rt(6)},
+      {name:"1/√3",value:1/rt(3)},{name:"1/√2",value:1/rt(2)},{name:"5/4",value:1.25},{name:"4/3",value:4/3},
+      {name:"√2",value:rt(2)},{name:"3/2",value:1.5},{name:"φ",value:phi},{name:"√3",value:rt(3)},{name:"2",value:2},{name:"3",value:3},{name:"π",value:Math.PI}
+    ];
+  }
+  function nearestSimpleValue(x){
+    if(!isFinite(x) || x<=0) return null;
+    let best=null;
+    const powers=[];
+    for(let m=0.125;m<=8.0001;m*=2) powers.push({name:`×${m}`, value:m});
+    const targets=[...simpleConstantTargets(), ...powers];
+    for(const t of targets){
+      const logErr=Math.abs(Math.log(x/t.value));
+      const pctErr=Math.abs(x/t.value-1);
+      if(!best || logErr<best.logErr) best={...t,logErr,pctErr};
+    }
+    return best;
+  }
+  function roundnessInfo(v){
+    if(!isFinite(v)) return null;
+    const targets=[1,2,3,4,5,10,12,15,20,24,25,30,32,40,50,60,64,100];
+    let best=null;
+    for(const t of targets){
+      const err=Math.abs(v-t);
+      const rel=err/Math.max(1,Math.abs(t));
+      if(!best || rel<best.rel) best={target:t,err,rel};
+    }
+    return best;
+  }
+  function normalizedLandmarkValues(res, bu){
+    const lm = platformLandmarks(res);
+    const bands = res.bands || [];
+    function bw(b){ return b ? (isFinite(b.rawMedianWidth)?b.rawMedianWidth:b.rHat) : NaN; }
+    const rows=[];
+    function add(label,value){ if(isFinite(value) && isFinite(bu) && bu>0) rows.push({label,value,n:value/bu, near:nearestSimpleValue(value/bu)}); }
+    add("height", lm.height);
+    add("max width", lm.maxWidth);
+    add("belly", lm.bellyWidth);
+    add("foot/base", bw(lm.baseBand));
+    add("lip/top", bw(lm.topBand));
+    if(bands.length>2){
+      const neck = bands.slice(Math.max(0,bands.length-4)).reduce((best,b)=>{ const w=bw(b), bw0=best?bw(best):Infinity; return w<bw0?b:best; }, null);
+      add("neck", bw(neck));
+    }
+    add("mean radius", res.texture?.mean || res.texture?.median);
+    add("scaffold width", res.c || (bands[0] && bands[0].rHat));
+    add("scaffold step", res.k);
+    return rows;
+  }
+  function scoreBaseUnitCandidate(cand, pack){
+    const {res,dg,xc,rec}=pack;
+    const bands = res.bands || [];
+    const widths = bands.map(b=>isFinite(b.rawMedianWidth)?b.rawMedianWidth:b.rHat).filter(isFinite);
+    const normalized = widths.map(w=>w/cand.value).filter(x=>isFinite(x)&&x>0);
+    const normLandmarks = normalizedLandmarkValues(res, cand.value);
+    const landmarkSimplicity = normLandmarks.length ? normLandmarks.reduce((a,row)=>a+Math.max(0,1-(row.near?.logErr||9)/0.045),0)/normLandmarks.length : 0;
+    const bandSimplicity = normalized.length ? normalized.reduce((a,x)=>a+Math.max(0,1-(nearestSimpleValue(x)?.logErr||9)/0.045),0)/normalized.length : 0;
+    const clusterMap = new Map();
+    normLandmarks.forEach(row=>{ if(row.near && row.near.logErr<0.035) clusterMap.set(row.near.name,(clusterMap.get(row.near.name)||0)+1); });
+    const clusterReuse = normLandmarks.length ? clamp(Math.max(0,...Array.from(clusterMap.values()))/Math.max(3,normLandmarks.length),0,1) : 0;
+    const rawSupport = dg.steps.length ? dg.rawSupportedSteps/dg.steps.length : 0;
+    const recipScore = clamp((rec.centerWeightedScore??rec.score??0),0,1);
+    const xyzScore = xc ? clamp((xc.tripleEcho + xc.tripleClosure*2 + xc.pairSame)/(Math.max(10, dg.steps.length||10)),0,1) : 0;
+    const rawSnap = clamp(1 - (dg.meanAbsRawSnapLogDelta || 0)/0.018,0,1);
+    const roundness = roundnessInfo(cand.value);
+    const roundScore = roundness ? Math.max(0,1-roundness.rel/0.002) : 0;
+
+    // BU score emphasizes the things that actually change when BU changes: normalized
+    // dimensional simplicity, landmark clustering, and intrinsic roundness. Scale-invariant
+    // evidence is shown as context, but weighted lightly.
+    const overall = clamp(landmarkSimplicity*.34 + bandSimplicity*.18 + clusterReuse*.12 + roundScore*.08 + rawSupport*.08 + recipScore*.08 + xyzScore*.06 + rawSnap*.06,0,1);
+    return {...cand, normalized:normLandmarks, landmarkSimplicity, bandSimplicity, clusterReuse, roundScore, roundness, rawSupport, recipScore, xyzScore, rawSnap, overall};
+  }
+  function coordinateLensRows(pack){
+    const {res,xc,rec}=pack;
+    const lm = platformLandmarks(res);
+    const sphere = clamp(res.fixedCenter?.sphereSimilarity || 0,0,1);
+    const recip = clamp(rec.centerWeightedScore??rec.score??0,0,1);
+    const xyz = xc ? clamp((xc.tripleEcho + xc.tripleClosure*2 + xc.pairSame)/35,0,1) : 0;
+    return [
+      {id:"local", name:"Local Slice Center (raw)", origin:"Each unsmoothed slice centroid", reference:"Per-slice intersection cloud", scale:"model units", advantage:"Lets every ring answer from its own immediate measured center.", change:"Most responsive to local asymmetry and scan noise.", summary:"Useful as the least-constrained local reference and as a check against over-smoothing."},
+      {id:"fixed", name:"Global Reference Center", origin:"Mean of the slice-center trajectory", reference:"One shared center in the slice plane", scale:"model units", advantage:"Tests whether radial behavior survives one global origin.", change:`Current fixed-center sphere similarity ${pct(sphere)}.`, summary:"Useful for sphere-like one-center questions and for exposing center drift."},
+      {id:"floating", name:"Floating Spine", origin:"Smoothed per-slice centroid path", reference:"Continuously moving internal centerline", scale:"model units", advantage:"Separates coherent center migration from radial surface change.", change:"Observed changes emphasize spine drift, bend, and envelope stability.", summary:"Useful for eggs, shells, faces, vessels, or any form whose best reference may evolve through height."},
+      {id:"axisRef", name:"Straight Axis / Lathe Reference", origin:"Best straight fit through local centroids", reference:"One cylindrical centerline", scale:"model units", advantage:"Tests whether a single coaxial line economically explains the moving centers.", change:"Compare straight-axis residual against floating-spine residual in Center Preference and Spine Diagnostics.", summary:"Useful as the explicit cylindrical/lathe hypothesis rather than silently assuming the world axis."},
+      {id:"scaffoldRef", name:"Scaffold / Envelope Reference", origin:"Measured radius scaffold and r10–r90 envelope", reference:"Snapped state spine plus measured spread", scale:"model units / state units", advantage:"Reads radial organization and centerline organization as complementary layers.", change:"Use Scaffold + Envelope, Centroid Trajectory, and Spine Diagnostics together.", summary:"Useful when absolute radii traverse while their rate, state, or envelope behavior remains organized."},
+      {id:"sphere", name:"Sphere Reference", origin:"Fitted sphere center", reference:"Half-sphere residual", scale:"residual units", advantage:"Makes ideal sphere-like behavior go quiet.", change:`Sphere residual quietness ${pct(sphere)}.`, summary:"Residual structure is the object after subtracting a simple sphere model."},
+      {id:"belly", name:"Belly-Aligned", origin:`Belly band #${lm.bellyBand+1}`, reference:"Widest measured region", scale:"normalized height", advantage:"Compares lower and upper traversals around the widest point.", change:`Reciprocal traversal score ${pct(recip)}.`, summary:"Useful for mirror, expansion/contraction, and phase-echo questions."},
+      {id:"neck", name:"Neck-Aligned", origin:"Narrow upper landmark", reference:"Upper constriction", scale:"normalized height", advantage:"Highlights lip/neck transitions and upper-region departures.", change:"Observed changes concentrate near upper band boundaries.", summary:"Useful when the top aperture or neck geometry matters."},
+      {id:"landmark", name:"Landmark-Aligned", origin:"Chosen landmark", reference:"Belly, shoulder, neck, or base", scale:"normalized landmark space", advantage:"Compares shapes after shared landmark registration.", change:"Constellation overlays and deviation plots use this idea.", summary:"Useful for comparing multiple objects without claiming shared origin."},
+      {id:"baseUnit", name:"Base Unit Normalized", origin:"Candidate BU = 1", reference:"Intrinsic unit candidate", scale:"BU units", advantage:"Tests whether ratios simplify when expressed in a candidate unit.", change:"See Base Unit Explorer ranking.", summary:"Useful for comparing candidate coordinate systems."},
+      {id:"user", name:"User Defined", origin:"Researcher supplied", reference:"Manual value or landmark pair", scale:"custom BU units", advantage:"Supports hypothesis testing without altering measurements.", change:"Only downstream reporting changes.", summary:"Useful for documenting an external measuring convention."}
+    ].map(row=>({...row, score: row.id==="belly"?recip:row.id==="sphere"||row.id==="fixed"?sphere:row.id==="axisRef"||row.id==="floating"||row.id==="scaffoldRef"?0.58:row.id==="baseUnit"?0.5:row.id==="landmark"?xyz:0.45}));
+  }
+  function crossLensConsensus(pack, buRows=[]){
+    const {res,dg,xc,rec}=pack;
+    const lenses = [
+      ["Scaffold Lens", clamp(res.snapPurity||0,0,1), "candidate state stability"],
+      ["Reciprocal Lens", clamp(rec.centerWeightedScore??rec.score??0,0,1), "belly/mirror closure"],
+      ["Grammar Lens", dg.steps.length ? clamp(dg.rawSupportedSteps/dg.steps.length,0,1) : 0, "raw step participation"],
+      ["XYZ Lens", xc ? clamp((xc.tripleEcho + xc.tripleClosure*2 + xc.pairSame)/35,0,1) : 0, "cross-axis cooperation"],
+      ["Sphere Lens", clamp(res.fixedCenter?.sphereSimilarity || 0,0,1), "sphere-reference quietness"],
+      ["Base Unit Lens", buRows[0] ? buRows[0].overall : 0, "candidate BU simplicity"],
+      ["Coordinate Lens", 0.5 + 0.5*clamp(rec.centerWeightedScore??res.snapPurity??0,0,1), "coordinate-system stability"]
+    ];
+    const vals = lenses.map(x=>x[1]).filter(isFinite);
+    const overall = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+    return {overall, lenses};
+  }
+  function populateActiveBUSelect(buRows){
+    const sel = document.getElementById("activeBUSelect");
+    if(!sel) return;
+    const previous = sel.value || "auto";
+    const opts = [`<option value="auto">Auto: top suggested</option>`];
+    (buRows||[]).forEach((r,i)=>{
+      const label = `${i+1}. ${r.name} — ${pct(r.overall)} (${safeNum(r.value,5)})`;
+      opts.push(`<option value="${i}">${escapeHtml(label)}</option>`);
+    });
+    opts.push(`<option value="manual">Manual entered value</option>`);
+    sel.innerHTML = opts.join("");
+    const values = new Set(Array.from(sel.options).map(o=>o.value));
+    sel.value = values.has(previous) ? previous : "auto";
+  }
+  function selectedBUFromRows(buRows){
+    const sel = document.getElementById("activeBUSelect");
+    const manual = parseFloat(document.getElementById("manualBUInput")?.value || "");
+    const rows = buRows || [];
+    if(sel && sel.value === "manual" && isFinite(manual) && manual>0){
+      const fake = {name:"Manual BU", value:manual, source:"user-entered value", aliasText:"", overall:0, landmarkSimplicity:0, bandSimplicity:0, clusterReuse:0, recipScore:0, xyzScore:0, rawSupport:0, rawSnap:0, roundScore:0, normalized:[]};
+      return fake;
+    }
+    if(sel && sel.value !== "auto" && sel.value !== "manual"){
+      const idx = parseInt(sel.value,10);
+      if(rows[idx]) return rows[idx];
+    }
+    return rows[0] || null;
+  }
+  function compactBUStory(top){
+    if(!top || !top.normalized) return "Analyze an STL to rank candidate coordinate reads.";
+    const hits = top.normalized.filter(row=>row.near && row.near.pctErr<=0.01);
+    const very = top.normalized.filter(row=>row.near && row.near.pctErr<=0.003);
+    const names = hits.slice(0,5).map(row=>`${row.label} ≈ ${row.near.name}`).join(", ");
+    if(very.length>=3) return `${top.name} creates a compact coordinate read: ${names}. These are normalized descriptions of the current record, not claims about historical units.`;
+    if(hits.length>=3) return `${top.name} gives several usable simple-neighborhood reads (${names}). Treat this as a promising normalization to compare against other BU choices.`;
+    if(hits.length) return `${top.name} gives a few simple-neighborhood reads (${names}), but the coordinate system remains mixed under the current score.`;
+    return `${top.name} is selected, but the normalized landmarks do not strongly collapse into simple neighborhoods under the current tolerance.`;
+  }
+  function renderPlatformLensReport(){
+    const run = getActiveRun();
+    const coordOut = document.getElementById("coordinateLensOut");
+    const buOut = document.getElementById("baseUnitExplorerOut");
+    const consensusOut = document.getElementById("crossLensConsensusOut");
+    const hasRun = !!(run && run.res);
+    ["coordinateLensSelect","manualBUInput","refreshPlatformLens","activeBUSelect"].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=!hasRun; });
+    if(!hasRun){
+      if(coordOut) coordOut.textContent = "Analyze an STL to summarize coordinate-system choices.";
+      if(buOut) buOut.textContent = "Analyze an STL to rank candidate Base Units.";
+      if(consensusOut) consensusOut.textContent = "Analyze an STL to compare independent downstream lenses.";
+      populateActiveBUSelect([]);
+      return;
+    }
+    const pack = getReportSummary(run);
+    const selected = document.getElementById("coordinateLensSelect")?.value || "local";
+    const coordRows = coordinateLensRows(pack);
+    const activeCoord = coordRows.find(r=>r.id===selected) || coordRows[0];
+    const buRows = candidateBaseUnits(run).map(c=>scoreBaseUnitCandidate(c, pack)).sort((a,b)=>b.overall-a.overall).slice(0,12);
+    populateActiveBUSelect(buRows);
+    let chosenBU = selectedBUFromRows(buRows);
+    if(chosenBU && (!chosenBU.normalized || !chosenBU.normalized.length)){
+      chosenBU = scoreBaseUnitCandidate(chosenBU, pack);
+    }
+    const consensus = crossLensConsensus(pack, buRows);
+    if(coordOut){
+      coordOut.innerHTML = `<p>${escapeHtml(measurementRecordNote(pack.res))}</p>
+        <div class="lensMetricGrid">
+          ${metricCard("origin", activeCoord.origin)}
+          ${metricCard("reference", activeCoord.reference)}
+          ${metricCard("scale", activeCoord.scale)}
+          ${metricCard("lens fit", pct(activeCoord.score), activeCoord.score)}
+        </div>
+        <p><b>Advantages:</b> ${escapeHtml(activeCoord.advantage)}</p>
+        <p><b>Observed changes:</b> ${escapeHtml(activeCoord.change)}</p>
+        <p><b>Semantic summary:</b> ${escapeHtml(activeCoord.summary)} This is a coordinate-system read, not a modification of the stored measurement record.</p>`;
+    }
+    if(buOut){
+      const top = chosenBU || buRows[0];
+      const topIndex = buRows.findIndex(r=>top && r.name===top.name && Math.abs(r.value-top.value)<1e-9);
+      const roundFlag = (r)=> (r && r.roundness && r.roundness.rel < 0.002) ? `<span class="buRoundFlag">≈ ${safeNum(r.roundness.target,0)} Δ ${safeNum(r.roundness.err,5)}</span>` : "";
+      const aliasNote = (r)=> r && r.aliasText ? `<span class="buDuplicateNote">same value also appears as: ${escapeHtml(r.aliasText)}</span>` : "";
+      const rows = buRows.map((r,i)=>`<tr class="${topIndex===i?'buSelected':''}"><td>${i+1}</td><td><button class="jumpStepBtn" data-bu-pick="${i}" title="Use this candidate as BU = 1">use</button> ${escapeHtml(r.name)}${roundFlag(r)}${aliasNote(r)}</td><td>${safeNum(r.value,5)}</td><td>${escapeHtml(r.source)}</td><td>${pct(r.overall)}</td><td>${pct(r.landmarkSimplicity)}</td><td>${pct(r.bandSimplicity)}</td><td>${pct(r.clusterReuse)}</td><td>${pct(r.recipScore)}</td><td>${pct(r.xyzScore)}</td></tr>`).join("");
+      const normalizedRows = top ? (top.normalized||[]).slice(0,14) : [];
+      const normalizedCells = normalizedRows.map(row=>`<div class="buNormCell"><b>${escapeHtml(row.label)}</b><span>${safeNum(row.n,5)} BU</span><span class="buDuplicateNote">nearest ${escapeHtml(row.near?.name||"—")} · err ${row.near?safeNum(row.near.pctErr*100,2):"—"}%</span></div>`).join("");
+      const strongHits = normalizedRows.filter(row=>row.near && row.near.pctErr<=0.006);
+      const usableHits = normalizedRows.filter(row=>row.near && row.near.pctErr<=0.015);
+      const fractionLike = normalizedRows.filter(row=>row.near && /\/|√|φ|π|^\d+$/.test(row.near.name||"")).slice(0,8).map(row=>`${row.label}=${safeNum(row.n,4)}≈${row.near.name}`).join(" · ");
+      const topRead = top ? compactBUStory(top) : "Analyze an STL to rank candidate Base Units.";
+      buOut.innerHTML = `<p>BU Explorer asks whether setting <b>BU = 1</b> makes the current measurement record easier to describe. It ranks candidate coordinate systems only; it does not declare a historical unit, design unit, or correct unit.</p>
+        <div class="buControls">
+          <b>How to use:</b> pick any BU candidate from the selector above or click <b>use</b> in the table. FLEX then rewrites the same landmarks in that unit so you can see whether they become simple, fractional, whole-number, root-like, or messy.
+        </div>
+        <p><b>Current read:</b> ${topRead}</p>
+        <div class="lensMetricGrid">
+          ${metricCard("active BU", top?.name || "—", top?.overall || 0)}
+          ${metricCard("BU value", top ? safeNum(top.value,5) : "—")}
+          ${metricCard("overall score", top ? pct(top.overall) : "—", top?.overall || 0)}
+          ${metricCard("simple landmarks", top ? `${strongHits.length} tight / ${usableHits.length} usable` : "—", top ? clamp(usableHits.length/Math.max(1,normalizedRows.length),0,1) : 0)}
+        </div>
+        ${top ? `<div class="buRecipe"><b>Coordinate recipe:</b> ${escapeHtml(top.name)} = 1 BU. ${fractionLike ? `Compact read: ${escapeHtml(fractionLike)}.` : "No strong compact landmark chain under the current tolerance."}</div>` : ""}
+        ${top ? `<div class="buNormGrid">${normalizedCells}</div>` : ""}
+        <details style="margin-top:8px" open><summary>Suggested BU ranking and scores</summary><div class="lensTableWrap"><table><thead><tr><th>#</th><th>candidate BU</th><th>BU value</th><th>source</th><th>overall</th><th>landmark simplicity</th><th>band simplicity</th><th>reuse</th><th>reciprocal</th><th>XYZ</th></tr></thead><tbody>${rows || '<tr><td colspan="10">No candidate Base Units available.</td></tr>'}</tbody></table></div></details>
+        <details style="margin-top:8px"><summary>What the score means</summary><div class="buScoreExplain"><div><b>Landmark simplicity</b><br/>Do major landmarks become near simple values after BU normalization?</div><div><b>Band simplicity</b><br/>Do repeated band widths land near compact number neighborhoods?</div><div><b>Reuse</b><br/>Do several landmarks reuse the same target family?</div><div><b>Reciprocal / XYZ</b><br/>Context from other downstream lenses; mostly scale-invariant, so it should support rather than dominate the BU score.</div></div></details>
+        <div class="tiny" style="margin-top:6px">Note: raw constants, reciprocal closure, and XYZ cooperation are mostly scale-invariant, so the BU score emphasizes what actually changes under normalization: simple normalized landmarks, repeated simple neighborhoods, clustering, and obvious round-number flags such as 29.99999 ≈ 30.</div>`;
+      buOut.querySelectorAll("[data-bu-pick]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const sel=document.getElementById("activeBUSelect");
+          if(sel){ sel.value=String(btn.getAttribute("data-bu-pick")); renderPlatformLensReport(); }
+        });
+      });
+    }
+    if(consensusOut){
+      const rows = consensus.lenses.map(l=>`<tr><td>${escapeHtml(l[0])}</td><td>${pct(l[1])}<div class="lensScoreBar"><i style="width:${(clamp(l[1],0,1)*100).toFixed(1)}%"></i></div></td><td>${escapeHtml(l[2])}</td></tr>`).join("");
+      consensusOut.innerHTML = `<p>Agreement across independent lenses becomes its own observable. High consensus suggests geometry worth further investigation; low consensus may mean the active lens is too narrow, the measurement configuration should be compared, or the object is structurally mixed.</p>
+        <div class="lensMetricGrid">
+          ${metricCard("overall lens consensus", pct(consensus.overall), consensus.overall)}
+          ${metricCard("lens count", consensus.lenses.length)}
+          ${metricCard("wording tier", consensus.overall>0.7 ? "appears stable" : consensus.overall>0.45 ? "suggestive / mixed" : "exploratory")}
+        </div>
+        <div class="lensTableWrap"><table><thead><tr><th>lens</th><th>score</th><th>what it reads</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+  }
+  function platformReportHTMLBlock(run, pack){
+    if(!run || !pack) return "";
+    const coordRows = coordinateLensRows(pack);
+    const buRows = candidateBaseUnits(run).map(c=>scoreBaseUnitCandidate(c, pack)).sort((a,b)=>b.overall-a.overall).slice(0,8);
+    const consensus = crossLensConsensus(pack, buRows);
+    const coord = coordRows.find(r=>r.id==="local") || coordRows[0];
+    const buTable = buRows.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.name)}${r.aliasText?` (${escapeHtml(r.aliasText)})`:""}</td><td>${safeNum(r.value,5)}</td><td>${escapeHtml(r.source)}</td><td>${pct(r.overall)}</td><td>${pct(r.landmarkSimplicity)}</td></tr>`).join("");
+    const lensTable = consensus.lenses.map(l=>`<tr><td>${escapeHtml(l[0])}</td><td>${pct(l[1])}</td><td>${escapeHtml(l[2])}</td></tr>`).join("");
+    return `<div class="card"><h2>Measurement Platform Read</h2>
+      <p class="muted">${escapeHtml(measurementRecordNote(pack.res))}</p>
+      <div class="kv"><b>Coordinate system</b><span>${escapeHtml(coord.name)} — ${escapeHtml(coord.summary)}</span><b>Top candidate BU</b><span>${buRows[0] ? `${escapeHtml(buRows[0].name)} (${pct(buRows[0].overall)})` : "not available"}</span><b>Overall lens consensus</b><span>${pct(consensus.overall)}</span></div>
+      <h3>Suggested Base Units</h3><table><thead><tr><th>#</th><th>candidate BU</th><th>value</th><th>source</th><th>overall score</th><th>normalized simplicity</th></tr></thead><tbody>${buTable || '<tr><td colspan="6">No candidate Base Units available.</td></tr>'}</tbody></table>
+      <h3>Cross-Lens Consensus</h3><table><thead><tr><th>lens</th><th>score</th><th>what it reads</th></tr></thead><tbody>${lensTable}</tbody></table>
+      <p class="muted">These are downstream comparisons for research orientation. They explore, suggest, and compare; they do not settle a coordinate system, Base Unit, or interpretation.</p>
+    </div>`;
+  }
   function drawReportText(g, x, y, lines, opts={}){
     const lh = opts.lh || 22;
     g.font = opts.font || "18px " + getComputedStyle(document.body).fontFamily;
@@ -8116,7 +8965,7 @@ if (pointCountGL===0 && triCountGL===0){
   }
   function reportInsightBullets(pack){
     const {res,dg,xc,cal,rec}=pack;
-    const lines=[];
+    const lines=[measurementRecordNote(res)];
     const rawRate = dg.steps.length ? dg.rawSupportedSteps/dg.steps.length : 0;
     if(rawRate>=0.50) lines.push(`High raw support: ${dg.rawSupportedSteps}/${dg.steps.length} steps track snapped grammar.`);
     else if(rawRate>=0.25) lines.push(`Moderate raw support: ${dg.rawSupportedSteps}/${dg.steps.length} steps participate.`);
@@ -8320,6 +9169,7 @@ if (pointCountGL===0 && triCountGL===0){
       <div class="grid"><div><h2>3D orientation</h2><img src="${img(glCanvas)}"></div><div><h2>Scaffold + envelope</h2><img src="${img(rzCv)}"></div></div>
       <div class="card"><h2>Top-level read</h2><div class="kv"><b>classification</b><span>${escapeHtml(res.classification?.label||"—")}</span><b>why</b><span>${escapeHtml(res.classification?.why||"—")}</span><b>snap purity</b><span>${(res.snapPurity*100).toFixed(2)}%</span><b>transitions</b><span>${res.transitions}</span><b>scaffold step</b><span>${safeNum(res.k,6)}</span><b>texture median</b><span>${safeNum(res.texture?.median,4)}</span><b>reciprocal score</b><span>${((rec.centerWeightedScore??rec.score??0)*100).toFixed(1)}%</span></div></div>
       <div class="card"><h2>Semantic downstream read</h2><ul>${reportInsightBullets({res,dg,xc,cal,rec}).map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul><p class="muted">Scores: ${reportSignatureScores({res,dg,xc,cal,rec}).map(([k,v])=>`<span class="reportChip">${escapeHtml(k)} ${(v*100).toFixed(0)}%</span>`).join(" ")}</p></div>
+      ${platformReportHTMLBlock(run,{res,dg,xc,cal,rec})}
       ${bellySeedHTMLBlock(res)}
       ${caliperGuideHTMLBlock(res,dg,cal)}
       ${allDossierGraphsHTML()}
@@ -8702,6 +9552,7 @@ if (pointCountGL===0 && triCountGL===0){
     const trace = computeHelicalNeedleTrace(res);
     if(!trace.ok){ musicSetStatus(trace.reason || 'Helical trace unavailable.'); return; }
     drawHelicalNeedleLab(trace);
+    drawRingField();
     const base = musicBase(), span = musicSpan()+4;
     const speedVal = String(musicSpeedEl?.value || 'normal');
     const ms = Math.max(10, musicSpeedMsV527('helical'));
@@ -8797,10 +9648,11 @@ if (pointCountGL===0 && triCountGL===0){
     let dg = res.derivativeGrammar || null; try{ dg = dg || computeDerivativeGrammar(res); }catch(e){}
     let xc = null; try{ xc = computeXYZDerivativeCoherence(run); }catch(e){}
     const rec = res.reciprocal || {};
+    const pack = (()=>{ try{ return getReportSummary(run); }catch(e){ return null; } })();
     const canvases = [
-      ['3D view', glCanvas], ['State / band progression', bandCv], ['Width vs Height', rzCv], ['Rule view', logCv],
+      ['3D view', glCanvas], ['State / band progression', bandCv], ['Radius vs Height', rzCv], ['Rule view', logCv],
       ['Fit error by height', residCv], ['Scaffold state by height', kCv], ['XYZ barcode', xyzBarcodeCv],
-      ['Constellation compare', compareCv], ['Scaffold deviation overlay', moneyCv], ['Scaffold / envelope lens', scaffoldCv], ['Meridian sweep', meridianCv], ['Helical needle', helicalCanvas]
+      ['Constellation compare', compareCv], ['Scaffold deviation overlay', moneyCv], ['Scaffold / envelope lens', scaffoldCv], ['Meridian sweep', meridianCv], ['Helical needle', helicalCanvas], ['Ring Field circumference unwrap', ringFieldCanvas]
     ];
     const chips = [
       `file ${escapeHtml(run.name)}`,
@@ -8815,7 +9667,7 @@ if (pointCountGL===0 && triCountGL===0){
       dg ? `raw locks ${dg.rawSupportedSteps}/${dg.steps.length}` : 'grammar pending',
       xc ? `XYZ ${escapeHtml(xc.read)}` : 'XYZ not computed'
     ];
-    const insights = (()=>{ try{ return reportInsightBullets(getReportSummary(run)).map(x=>`<li>${escapeHtml(x)}</li>`).join(''); }catch(e){ return '<li>Report insight layer pending.</li>'; } })();
+    const insights = (()=>{ try{ return reportInsightBullets(pack || getReportSummary(run)).map(x=>`<li>${escapeHtml(x)}</li>`).join(''); }catch(e){ return '<li>Report insight layer pending.</li>'; } })();
     const derivative = derivativeGrammarOut ? derivativeGrammarOut.innerHTML : '';
     const bandsHTML = document.querySelector('#bandsTbl') ? document.querySelector('#bandsTbl').outerHTML : '';
     return `<h1>FLEX Full Dossier</h1>
@@ -8823,6 +9675,7 @@ if (pointCountGL===0 && triCountGL===0){
       <div style="margin:10px 0">${chips.map(c=>`<span class="reportChip">${c}</span>`).join(' ')}</div>
       <div class="card"><h2>Research question</h2><p><b>What is the simplest description of this form?</b> Fixed Center Lens tests whether radial behavior survives one shared origin; Sphere Reference shows the object as a structured departure from the simplest possible one-center rule.</p></div>
       <div class="card"><h2>Top-level read</h2><ul>${insights}</ul></div>
+      ${pack ? platformReportHTMLBlock(run, pack) : ''}
       <div class="dossierGrid">${canvases.map(([t,cv])=>flexDossierCanvasFigure(t,cv)).join('')}</div>
       <div class="card"><h2>Detected bands</h2><div class="reportScroll">${bandsHTML || 'No band table available.'}</div></div>
       <div class="card"><h2>Derivative Grammar Report</h2><div class="reportScroll">${derivative || 'Derivative report pending.'}</div></div>`;
@@ -8857,6 +9710,12 @@ if (pointCountGL===0 && triCountGL===0){
       body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:28px;color:#111;line-height:1.36}.muted,.tiny{color:#666}.card{border:1px solid #ddd;border-radius:14px;padding:14px;margin:16px 0;break-inside:avoid}.dossierGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px}figure{margin:0;border:1px solid #eee;border-radius:12px;padding:10px;break-inside:avoid}img{max-width:100%;height:auto;border:1px solid #eee;border-radius:10px}table{width:100%;border-collapse:collapse;font-size:11px;break-inside:auto}td,th{border-bottom:1px solid #eee;padding:5px 6px;text-align:left;vertical-align:top}.reportChip{display:inline-block;border:1px solid #ddd;border-radius:999px;padding:3px 8px;margin:2px;background:#fff;font-size:12px}.grammarBox{border:1px solid #eee;border-radius:10px;padding:8px;margin:8px 0;break-inside:avoid;overflow:auto}.reportScroll{overflow:visible}.grammarTbl{font-size:10.5px}@media print{body{margin:12mm}.card,figure,.grammarBox{break-inside:avoid}.dossierGrid{grid-template-columns:1fr 1fr}}
       </style></head><body>${buildDossierHTML()}</body></html>`;
   }
+  ["coordinateLensSelect","manualBUInput","refreshPlatformLens","activeBUSelect"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener(id==="manualBUInput" ? "input" : "change", renderPlatformLensReport);
+  });
+  const refreshPlatformLensBtn = document.getElementById("refreshPlatformLens");
+  if(refreshPlatformLensBtn) refreshPlatformLensBtn.addEventListener("click", renderPlatformLensReport);
 
   function musicSpeedMsV530(mode='generic'){
     const v = String(musicSpeedEl?.value || 'normal');
@@ -8920,33 +9779,6 @@ if (pointCountGL===0 && triCountGL===0){
 <style>
   .audit-pill{padding:2px 8px;border-radius:999px;border:1px solid #ddd;font-size:12px;background:#fff}
   .audit-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
-  /* Observant Labs polish — lightweight wrapper only; does not change FLEX math or UI behavior */
-  .observantTopNav{
-    position:sticky;top:0;z-index:9998;margin:-18px -18px 14px -18px;
-    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-    padding:10px 18px;border-bottom:1px solid #dfeee0;background:rgba(250,255,250,.94);
-    backdrop-filter:blur(8px);box-shadow:0 6px 24px rgba(0,0,0,.045)
-  }
-  .observantBrand{font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#132313}
-  .observantLinks{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .observantLinks a{
-    display:inline-flex;align-items:center;justify-content:center;border:1px solid #cfe7cf;
-    border-radius:999px;padding:7px 10px;background:#fff;color:#142114;text-decoration:none;
-    text-transform:uppercase;letter-spacing:.10em;font-size:11px;font-weight:700
-  }
-  .observantLinks a:hover{background:#f0fff0;border-color:#8fd68f}
-  .labIntro{
-    border:1px solid #d8ead8;border-radius:14px;background:linear-gradient(135deg,#fbfffb,#f5fff5);
-    padding:12px 14px;margin:10px 0 12px 0;color:#172417
-  }
-  .labIntro b{color:#000}
-  .labIntro ul{margin:7px 0 0 18px;padding:0}
-  .labIntro li{margin:3px 0}
-  @media(max-width:850px){
-    .observantTopNav{position:static;margin:-18px -18px 12px -18px}
-    .observantLinks a{font-size:10px;padding:6px 8px}
-  }
-
 </style>
 
 <div class="card soft" style="margin-top:10px">
@@ -9044,6 +9876,13 @@ if (pointCountGL===0 && triCountGL===0){
     return (result && typeof result.__confidence==="number") ? result.__confidence : 1;
   };
 
+
+  if (showAxisCompassEl){
+    showAxisCompassEl.addEventListener("change", ()=>{
+      if (axisCompassCanvas) axisCompassCanvas.style.display = showAxisCompassEl.checked ? "block" : "none";
+      try{ renderGL(); }catch(e){}
+    });
+  }
 })();
 </script>
 
