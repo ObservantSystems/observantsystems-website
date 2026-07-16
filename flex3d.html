@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>FLEX v5.2.35 — Scientific Cleanliness Pass</title>
+<title>FLEX v5.2.41 — Self-Reference Orientation Lab</title>
 <style>
   :root{
     --bg:#ffffff; --fg:#111; --muted:#666; --line:#e8e8e8; --card:#fafafa;
@@ -194,7 +194,7 @@
 </head>
 <body>
 <nav class="homeNav" aria-label="Observant Drive"><a href="https://observantdrive.com/">← ObservantDrive.com</a></nav>
-<h1>FLEX v5.2.35 — Geometric Measurement Platform</h1>
+<h1>FLEX v5.2.41 — Geometric Measurement Platform</h1>
 <div class="small"><b>Measure first. Compare second. Interpret last.</b> FLEX builds a cross-sectional measurement record, then re-reads that same record through explicit geometric lenses. Raw measurements remain separate from fitted scaffolds, reciprocal tests, and optional reference libraries.</div>
 <div class="platformFrame small">
   <b>Platform hierarchy.</b> FLEX distinguishes what was measured, what was derived, and what is being interpreted.
@@ -360,6 +360,24 @@ No internet, no uploads. All computation stays in your browser.
       <span class="small" style="margin-left:10px"><b>Default</b>:</span>
       <label class="small"><input id="defaultSlice" type="checkbox"/> start in Slice Engine</label>
       <label class="small" title="Compute the same active measurement protocol across X, Y, and Z for cross-axis comparison."><input id="xyzCoherence" type="checkbox" disabled/> cross-axis agreement (X/Y/Z)</label>
+      <label class="small" title="Choose the scout budget before enabling the solver. Higher depth tests more candidate directions before the final full analysis."><b>solve depth</b>
+        <select id="selfOrientDepth" disabled>
+          <option value="20">20% scout</option>
+          <option value="40" selected>40% balanced</option>
+          <option value="70">70% fine</option>
+        </select>
+      </label>
+      <label class="small" title="Choose what the orientation search rewards. This changes only the candidate ranking; the final FLEX measurement formulas remain unchanged."><b>orientation objective</b>
+        <select id="selfOrientObjective" disabled>
+          <option value="hybrid" selected>Hybrid evidence (recommended)</option>
+          <option value="raw">Raw/scaffold agreement</option>
+          <option value="reciprocal">Reciprocal organization</option>
+          <option value="spine">Straightest centroid spine</option>
+          <option value="legacy">Legacy fast scout</option>
+        </select>
+      </label>
+      <label class="small" title="Experimental: estimate an object-preferred traversal direction, then run the normal FLEX math on that fixed candidate vector."><input id="selfOrientAxis" type="checkbox" disabled/> self-reference orientation</label>
+      <span id="selfOrientRead" class="small">choose depth + objective, then enable; solver locks one candidate vector</span>
     </div>
 
     <div class="miniRow">
@@ -401,7 +419,7 @@ No internet, no uploads. All computation stays in your browser.
     </details>
 
     <div id="protocolAudit" class="protocolAudit small">
-      <b>Protocol:</b> radial percentiles → optional bounded scaffold fit → downstream reciprocal / reference comparisons. Search domain and sampling settings are part of the result, not hidden assumptions.
+      <b>Protocol:</b> radial percentiles → optional bounded scaffold fit → downstream reciprocal / reference comparisons. Experimental orientation is an explicit candidate search with selectable objective and budget. Search domain and sampling settings are part of the result, not hidden assumptions.
     </div>
 
     <div class="miniRow">
@@ -1083,6 +1101,10 @@ No internet, no uploads. All computation stays in your browser.
   const perfMode = $("perfMode");
   const mathSpeedMode = $("mathSpeedMode");
   const xyzReuseActive = $("xyzReuseActive");
+  const selfOrientAxisEl = $("selfOrientAxis");
+  const selfOrientDepthEl = $("selfOrientDepth");
+  const selfOrientObjectiveEl = $("selfOrientObjective");
+  const selfOrientReadEl = $("selfOrientRead");
   let PERF_MODE = String((perfMode && perfMode.value) || "stability");
   if (perfMode) perfMode.addEventListener("change", ()=>{ PERF_MODE = String(perfMode.value||"stability"); updateProgressPanel(); });
 
@@ -1447,28 +1469,37 @@ const exportBandsBtn = $("exportBands");
       centerLockGlobal: !!(overrides.centerLockGlobal ?? (centerLock && centerLock.checked)),
       mathSpeedMode: String(overrides.mathSpeedMode || getMathSpeedProfile()),
       axisVector: overrides.axisVector ? overrides.axisVector.map(v=>Number(v).toFixed(7)).join(",") : "",
-      axisLabel: overrides.axisLabel || ""
+      axisLabel: overrides.axisLabel || "",
+      selfOrientAxis: !!(overrides.selfOrientAxis ?? (selfOrientAxisEl && selfOrientAxisEl.checked)),
+      selfOrientDepth: String(overrides.selfOrientDepth ?? (selfOrientDepthEl ? selfOrientDepthEl.value : "40")),
+      selfOrientObjective: String(overrides.selfOrientObjective ?? (selfOrientObjectiveEl ? selfOrientObjectiveEl.value : "hybrid"))
     });
   }
   function analysisCacheKey(run, overrides={}){
     return (run && run.id ? run.id : "no-run") + "|analysis|" + currentAnalysisSignature(overrides);
   }
-  function currentActiveAnalysisOpts(){
+  function currentActiveAnalysisOpts(run=null){
+    const useSelf = !!(selfOrientAxisEl && selfOrientAxisEl.checked);
     return {
       fitMode: fitMode ? (fitMode.value || "fit") : "fit",
       measureMode: measureMode ? (measureMode.value || "vertex") : "vertex",
       axisMode: axisMode ? (axisMode.value || "z") : "z",
-      centerLockGlobal: !!(centerLock && centerLock.checked)
+      centerLockGlobal: !!(centerLock && centerLock.checked),
+      selfOrientAxis: useSelf,
+      selfOrientDepth: selfOrientDepthEl ? selfOrientDepthEl.value : "40",
+      selfOrientObjective: selfOrientObjectiveEl ? selfOrientObjectiveEl.value : "hybrid",
+      axisVector: (useSelf && run && run._solvedAxisVector) ? run._solvedAxisVector : null,
+      axisLabel: (useSelf && run && run._solvedAxisLabel) ? run._solvedAxisLabel : ""
     };
   }
-  function activeAnalysisSignature(){
-    return currentAnalysisSignature(currentActiveAnalysisOpts());
+  function activeAnalysisSignature(run=null){
+    return currentAnalysisSignature(currentActiveAnalysisOpts(run));
   }
   function isRunFresh(run){
-    return !!(run && run.res && run._analysisSig && run._analysisSig === activeAnalysisSignature());
+    return !!(run && run.res && run._analysisSig && run._analysisSig === activeAnalysisSignature(run));
   }
   function markRunAnalyzed(run){
-    if (run) run._analysisSig = activeAnalysisSignature();
+    if (run) run._analysisSig = activeAnalysisSignature(run);
   }
   function markResultsStale(reason="settings changed"){
     if (staleBannerEl){
@@ -5350,6 +5381,10 @@ function renderCards(runs){
     minBandSlicesEl.disabled = !anyActive;
     maxBandsEl.disabled = !anyActive;
     xyzCoherenceEl.disabled = !anyActive;
+    if (selfOrientAxisEl) selfOrientAxisEl.disabled = !anyActive;
+    // Depth/objective stay selectable before enabling the solver, so the first run is clean and intentional.
+    if (selfOrientDepthEl) selfOrientDepthEl.disabled = !anyActive;
+    if (selfOrientObjectiveEl) selfOrientObjectiveEl.disabled = !anyActive;
 
     nullModeEl.disabled = !anyActive;
 
@@ -5801,6 +5836,150 @@ function renderCards(runs){
     updateUI();
   }
 
+
+  // -----------------------------
+  // Experimental self-referential orientation solver
+  // Coarse-to-fine scout only. It does not alter the STL or any downstream formulas;
+  // it selects one fixed arbitrary axis vector, then the normal analysis runs unchanged.
+  // -----------------------------
+  function jacobiEigenSym3(vertices, stride=9){
+    let mx=0,my=0,mz=0,n=0;
+    for(let i=0;i<vertices.length;i+=3*Math.max(1,stride)){
+      mx+=vertices[i]; my+=vertices[i+1]; mz+=vertices[i+2]; n++;
+    }
+    if(!n) return [[0,0,1],[1,0,0],[0,1,0]];
+    mx/=n; my/=n; mz/=n;
+    let a00=0,a01=0,a02=0,a11=0,a12=0,a22=0;
+    for(let i=0;i<vertices.length;i+=3*Math.max(1,stride)){
+      const x=vertices[i]-mx,y=vertices[i+1]-my,z=vertices[i+2]-mz;
+      a00+=x*x; a01+=x*y; a02+=x*z; a11+=y*y; a12+=y*z; a22+=z*z;
+    }
+    const A=[[a00,a01,a02],[a01,a11,a12],[a02,a12,a22]];
+    const V=[[1,0,0],[0,1,0],[0,0,1]];
+    for(let it=0;it<24;it++){
+      let p=0,q=1,max=Math.abs(A[0][1]);
+      for(const pair of [[0,2],[1,2]]){ const v=Math.abs(A[pair[0]][pair[1]]); if(v>max){max=v;p=pair[0];q=pair[1];} }
+      if(max<1e-10) break;
+      const phi=0.5*Math.atan2(2*A[p][q],A[q][q]-A[p][p]);
+      const c=Math.cos(phi), ss=Math.sin(phi);
+      for(let k=0;k<3;k++){
+        const apk=A[p][k], aqk=A[q][k];
+        A[p][k]=c*apk-ss*aqk; A[q][k]=ss*apk+c*aqk;
+      }
+      for(let k=0;k<3;k++){
+        const akp=A[k][p], akq=A[k][q];
+        A[k][p]=c*akp-ss*akq; A[k][q]=ss*akp+c*akq;
+      }
+      for(let k=0;k<3;k++){
+        const vkp=V[k][p], vkq=V[k][q];
+        V[k][p]=c*vkp-ss*vkq; V[k][q]=ss*vkp+c*vkq;
+      }
+    }
+    const eig=[0,1,2].map(j=>({val:A[j][j],vec:normalize3([V[0][j],V[1][j],V[2][j]])})).sort((a,b)=>b.val-a.val);
+    return eig.map(e=>e.vec);
+  }
+  function canonicalAxis(v){
+    let w=normalize3(v);
+    const k=Math.abs(w[0])>Math.abs(w[1])?(Math.abs(w[0])>Math.abs(w[2])?0:2):(Math.abs(w[1])>Math.abs(w[2])?1:2);
+    if(w[k]<0) w=w.map(x=>-x);
+    return w;
+  }
+  function axisVecKey(v){ return canonicalAxis(v).map(x=>x.toFixed(5)).join(","); }
+  function centerlineStraightness(res){
+    const cl=res?.measure?.centerline;
+    const z=res?.z||[];
+    const x=cl?.cxRaw||cl?.cx||[], y=cl?.cyRaw||cl?.cy||[];
+    const n=Math.min(z.length,x.length,y.length);
+    if(n<8) return {score:0,residual:1};
+    function fitResidual(vals){
+      let sz=0,sv=0,szz=0,szv=0;
+      for(let i=0;i<n;i++){sz+=z[i];sv+=vals[i];szz+=z[i]*z[i];szv+=z[i]*vals[i];}
+      const d=n*szz-sz*sz; const b=Math.abs(d)>1e-12?(n*szv-sz*sv)/d:0; const a=(sv-b*sz)/n;
+      let e=0; for(let i=0;i<n;i++){const q=vals[i]-(a+b*z[i]);e+=q*q;} return Math.sqrt(e/n);
+    }
+    const rr=Math.hypot(fitResidual(x),fitResidual(y));
+    const scale=median((res.r50||[]).filter(v=>isFinite(v)&&v>0))||1;
+    const norm=rr/scale;
+    return {score:Math.exp(-norm*18),residual:norm};
+  }
+  function selfOrientationScore(res, objective="hybrid"){
+    const base=axisStressScore(res);
+    const spine=centerlineStraightness(res);
+    const coverage=Math.min(1,(res.N_slices_used||0)/80);
+    const purity=(res.snapPurity||0)*100;
+    const rawSupport=base.rawSupport||0;
+    const rawRecips=base.rawRecips||0;
+    const rawDelta=base.rawDelta||0;
+    const reciprocal=base.recipScore||0;
+    let score=0;
+    // Explicit alternative definitions of "preferred orientation". None changes final measurement math.
+    if(objective==="raw"){
+      score = purity*0.70 + rawSupport*4.0 + rawRecips*1.6 - rawDelta*700 + coverage*3 + spine.score*4;
+    } else if(objective==="reciprocal"){
+      score = purity*0.45 + reciprocal*0.42 + rawRecips*3.0 + rawSupport*1.6 - rawDelta*480 + coverage*3 + spine.score*3;
+    } else if(objective==="spine"){
+      score = spine.score*70 + purity*0.20 + coverage*8 + rawSupport*0.5 - rawDelta*120;
+    } else if(objective==="legacy"){
+      score = base.score + spine.score*18 + coverage*4;
+    } else {
+      // Hybrid: less spine-dominant than v5.2.40 and more accountable to raw downstream evidence.
+      score = purity*0.55 + rawSupport*3.0 + rawRecips*1.8 + reciprocal*0.18 - rawDelta*560 + spine.score*12 + coverage*4;
+    }
+    return {score,base,spine,coverage,objective,purity,rawSupport,rawRecips,rawDelta,reciprocal};
+  }
+  function candidateRingAround(vec, tiltDeg, azN){
+    const b=makeAxisBasis({vec:canonicalAxis(vec),label:"seed"});
+    const out=[];
+    for(let i=0;i<azN;i++){
+      const phi=2*Math.PI*i/azN, th=tiltDeg*Math.PI/180;
+      const lat=[
+        b.u[0]*Math.cos(phi)+b.v[0]*Math.sin(phi),
+        b.u[1]*Math.cos(phi)+b.v[1]*Math.sin(phi),
+        b.u[2]*Math.cos(phi)+b.v[2]*Math.sin(phi)
+      ];
+      out.push(canonicalAxis([
+        b.w[0]*Math.cos(th)+lat[0]*Math.sin(th),
+        b.w[1]*Math.cos(th)+lat[1]*Math.sin(th),
+        b.w[2]*Math.cos(th)+lat[2]*Math.sin(th)
+      ]));
+    }
+    return out;
+  }
+  async function solveSelfOrientation(run, depthValue="40", objectiveValue="hybrid"){
+    const depth=parseInt(depthValue||"40",10);
+    const objective=String(objectiveValue||"hybrid");
+    const eig=jacobiEigenSym3(run.parsed.vertices, depth>=70?3:depth>=40?5:8);
+    let seeds=[[1,0,0],[0,1,0],[0,0,1],...eig].map(canonicalAxis);
+    const seen=new Set(); seeds=seeds.filter(v=>{const k=axisVecKey(v);if(seen.has(k))return false;seen.add(k);return true;});
+    const profile=depth>=70?{N:150,triStride:4,az:8,stages:[10,5,2]}:depth>=40?{N:110,triStride:6,az:6,stages:[10,4]}:{N:80,triStride:9,az:4,stages:[8]};
+    const rows=[];
+    async function test(v,label){
+      const key=axisVecKey(v);
+      const cached=rows.find(r=>r.key===key); if(cached) return cached;
+      reportProgress("Self-orientation scout",rows.length+1,null,label,{fileName:run.name,axis:label});
+      const res=await analyzeRunCached(run,{fitMode:"fit",measureMode:"slice",axisMode:axisMode?axisMode.value:"z",axisVector:v,axisLabel:label,centerLockGlobal:false,N:profile.N,triStride:profile.triStride,minPts:28,centerSmooth:7,mathSpeedMode:"turbo",cacheId:run.id+"|selforient"});
+      const sc=selfOrientationScore(res, objective); const row={key,vec:canonicalAxis(v),label,res,...sc}; rows.push(row); await maybeYield(true); return row;
+    }
+    for(let i=0;i<seeds.length;i++) await test(seeds[i],`orientation seed ${i+1}`);
+    let best=rows.slice().sort((a,b)=>b.score-a.score)[0];
+    for(let st=0;st<profile.stages.length;st++){
+      const tilt=profile.stages[st];
+      const ring=candidateRingAround(best.vec,tilt,profile.az);
+      for(let i=0;i<ring.length;i++) await test(ring[i],`orientation refine ${tilt}° ${i+1}/${ring.length}`);
+      best=rows.slice().sort((a,b)=>b.score-a.score)[0];
+    }
+    run._solvedAxisVector=best.vec.slice();
+    run._solvedAxisLabel=`SELF ${best.vec.map(v=>v.toFixed(4)).join(",")}`;
+    run._selfOrientAudit={depth,objective,score:best.score,spineResidual:best.spine.residual,candidates:rows.length,top:rows.slice().sort((a,b)=>b.score-a.score).slice(0,8).map(r=>({label:r.label,score:r.score,vec:r.vec,spineResidual:r.spine.residual,rawSupport:r.rawSupport,rawRecips:r.rawRecips,rawDelta:r.rawDelta,reciprocal:r.reciprocal}))};
+    if(selfOrientReadEl) selfOrientReadEl.textContent=`candidate ${run._solvedAxisLabel} · ${objective} · ${rows.length} candidates · spine residual ${best.spine.residual.toFixed(4)}`;
+    log(`Self-orientation candidate: ${run._solvedAxisLabel} | objective ${objective} | candidates ${rows.length} | score ${best.score.toFixed(2)} | raw support ${best.rawSupport} | raw recips ${best.rawRecips} | raw Δ ${best.rawDelta.toFixed(5)} | spine residual ${best.spine.residual.toFixed(5)}`);
+    return best;
+  }
+  function activeAxisOptsForRun(run){
+    const useSelf=!!(selfOrientAxisEl&&selfOrientAxisEl.checked&&run&&run._solvedAxisVector);
+    return useSelf?{axisVector:run._solvedAxisVector,axisLabel:run._solvedAxisLabel,selfOrientAxis:true,selfOrientDepth:selfOrientDepthEl?selfOrientDepthEl.value:"40",selfOrientObjective:selfOrientObjectiveEl?selfOrientObjectiveEl.value:"hybrid"}:{selfOrientAxis:false,selfOrientDepth:selfOrientDepthEl?selfOrientDepthEl.value:"40",selfOrientObjective:selfOrientObjectiveEl?selfOrientObjectiveEl.value:"hybrid"};
+  }
+
   // -----------------------------
   // Analyze pipeline
   // -----------------------------
@@ -5851,6 +6030,10 @@ function renderCards(runs){
 
         const mode = fitMode.value || "fit";
         const meas = measureMode.value || "vertex";
+        if (selfOrientAxisEl && selfOrientAxisEl.checked && !run._solvedAxisVector){
+          await solveSelfOrientation(run, selfOrientDepthEl ? selfOrientDepthEl.value : "40", selfOrientObjectiveEl ? selfOrientObjectiveEl.value : "hybrid");
+        }
+        const solvedAxisOpts = activeAxisOptsForRun(run);
 
         if (isRunFresh(run)){
           reportProgress("Analysis cache hit", i+1, runs.length, "result already matches current controls", {fileIndex:i+1, fileTotal:runs.length, fileName: run.name, axis: (axisMode ? axisMode.value : "z").toUpperCase()});
@@ -5861,7 +6044,7 @@ function renderCards(runs){
           log("Computing: envelope (median radial distance), bands, texture score…");
           if (meas === "slice") log("Using Slice Engine: triangle-plane intersections + smoothed centerline.");
 
-          const res = await analyzeRunCached(run, {fitMode: mode, measureMode: meas, axisMode: axisMode ? axisMode.value : "z", centerLockGlobal: !!(centerLock && centerLock.checked), cacheId: run.id});
+          const res = await analyzeRunCached(run, {fitMode: mode, measureMode: meas, axisMode: axisMode ? axisMode.value : "z", centerLockGlobal: !!(centerLock && centerLock.checked), cacheId: run.id, ...solvedAxisOpts});
           run.res = res;
           markRunAnalyzed(run);
           clearStale();
@@ -7297,7 +7480,8 @@ function drawXYZBarcode(run){
     drawCompare(analyzedRuns.map(r=>({name:r.name, res:r.res, color:r.color, isActive:r.id===activeId})));
     drawMoneyView(analyzedRuns);
 
-    sliceZ.value = Math.floor(0.5 * parseInt(sliceZ.max));
+    // Default the inspection highlight to the bottom edge instead of obscuring the middle of the object.
+    sliceZ.value = "0";
     sliceThick.value = sliceThick.value || 12;
     if (sliceThickPreset) sliceThickPreset.value = sliceThick.value;
     sliceLabel.textContent = (parseInt(sliceZ.value)/parseInt(sliceZ.max)).toFixed(3);
@@ -8247,7 +8431,7 @@ if (pointCountGL===0 && triCountGL===0){
   if (sliceThickPreset) sliceThickPreset.addEventListener("change", ()=>{ sliceThick.value = sliceThickPreset.value; refreshViewer(); });
   colorMode.addEventListener("change", refreshViewer);
   renderMode.addEventListener("change", refreshViewer);
-  if (centerLock) centerLock.addEventListener("change", ()=> reanalyzeActive());
+  if (centerLock) centerLock.addEventListener("change", ()=> { cancelCurrentRun("center mode changed"); scheduleReanalyzeActive("center mode changed",250); });
   if (cropPreviewBtn) cropPreviewBtn.addEventListener("click", updateCropPreview);
   if (cropAnalyzeBtn) cropAnalyzeBtn.addEventListener("click", analyzeHighlightedCrop);
   if (cropDeleteBtn) cropDeleteBtn.addEventListener("click", analyzeDeletedRegion);
@@ -8321,6 +8505,20 @@ if (pointCountGL===0 && triCountGL===0){
   if (exportRingFieldCSVBtn) exportRingFieldCSVBtn.addEventListener("click", exportRingFieldCSV);
   if (evidenceCheckBtn){ evidenceCheckBtn.addEventListener("click", ()=> runEvidenceCheck()); }
   if (axisStressRunBtn){ axisStressRunBtn.addEventListener("click", ()=> runAxisStressTest()); }
+  if (selfOrientAxisEl){ selfOrientAxisEl.addEventListener("change", ()=>{
+    for(const run of runs){ run._solvedAxisVector=null; run._solvedAxisLabel=""; run._selfOrientAudit=null; }
+    scheduleReanalyzeActive("self-reference orientation changed",250);
+  }); }
+  if (selfOrientDepthEl){ selfOrientDepthEl.addEventListener("change", ()=>{
+    for(const run of runs){ run._solvedAxisVector=null; run._solvedAxisLabel=""; run._selfOrientAudit=null; }
+    if(selfOrientAxisEl && selfOrientAxisEl.checked) scheduleReanalyzeActive("orientation solve depth changed",250);
+    else if(selfOrientReadEl) selfOrientReadEl.textContent=`ready: ${selfOrientDepthEl.value}% · ${selfOrientObjectiveEl?selfOrientObjectiveEl.value:"hybrid"}`;
+  }); }
+  if (selfOrientObjectiveEl){ selfOrientObjectiveEl.addEventListener("change", ()=>{
+    for(const run of runs){ run._solvedAxisVector=null; run._solvedAxisLabel=""; run._selfOrientAudit=null; }
+    if(selfOrientAxisEl && selfOrientAxisEl.checked) scheduleReanalyzeActive("orientation objective changed",250);
+    else if(selfOrientReadEl) selfOrientReadEl.textContent=`ready: ${selfOrientDepthEl?selfOrientDepthEl.value:"40"}% · ${selfOrientObjectiveEl.value}`;
+  }); }
 
   // Scout / guardrails
   if (scoutBtn){ scoutBtn.addEventListener("click", ()=> scoutActiveK()); }
@@ -8336,11 +8534,15 @@ if (pointCountGL===0 && triCountGL===0){
     if (piecewiseRow) piecewiseRow.style.display = (mode==="piecewise") ? "flex" : "none";
     try{
       startProgressSession("Reanalyzing active file", {fileName: run.name, axis: (axisMode ? axisMode.value : "z").toUpperCase(), detail:"updating views with current settings"});
+      if (selfOrientAxisEl && selfOrientAxisEl.checked && !run._solvedAxisVector){
+        await solveSelfOrientation(run, selfOrientDepthEl ? selfOrientDepthEl.value : "40", selfOrientObjectiveEl ? selfOrientObjectiveEl.value : "hybrid");
+      }
+      const solvedAxisOpts = activeAxisOptsForRun(run);
       if (isRunFresh(run)){
-        reportProgress("Analysis cache hit", 1, 1, "stored result matches current controls", {fileName: run.name, axis: (axisMode ? axisMode.value : "z").toUpperCase()});
+        reportProgress("Analysis cache hit", 1, 1, "stored result matches current controls", {fileName: run.name, axis: (run._solvedAxisLabel || (axisMode ? axisMode.value : "z")).toUpperCase()});
         clearStale();
       } else {
-        run.res = await analyzeRunCached(run, {fitMode: mode, measureMode: meas, axisMode: axisMode ? axisMode.value : "z", centerLockGlobal: !!(centerLock && centerLock.checked), cacheId: run.id});
+        run.res = await analyzeRunCached(run, {fitMode: mode, measureMode: meas, axisMode: axisMode ? axisMode.value : "z", centerLockGlobal: !!(centerLock && centerLock.checked), cacheId: run.id, ...solvedAxisOpts});
         markRunAnalyzed(run);
         clearStale();
         run.robust = null;
