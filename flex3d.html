@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>FLEX v5.2.41 — Self-Reference Orientation Lab</title>
+<title>FLEX v5.2.42 — BU Sanity + Review Overlays</title>
 <style>
   :root{
     --bg:#ffffff; --fg:#111; --muted:#666; --line:#e8e8e8; --card:#fafafa;
@@ -190,11 +190,19 @@
   .protocolAudit b{color:#111}.advancedGrid{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
   @media print{.flexTabBar,.dossierActions{display:none!important}.dossierViewer{max-height:none;overflow:visible;border:0;padding:0}.dossierViewer table{display:table;white-space:normal;overflow:visible}.dossierViewer .reportScroll{max-height:none;overflow:visible}.dossierViewer figure{break-inside:avoid}}
 
+
+  /* v5.2.42 experimental BU sanity + viewer relationship overlay */
+  #analysisOverlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;background:transparent;border:0}
+  .expToolGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin-top:10px}
+  .expTool{border:1px solid #e3e8f0;background:#fbfdff;border-radius:12px;padding:10px}
+  .expTool h3{font-size:13px;margin:0 0 6px}
+  .sanityHot{background:#eefaf2;border-color:#b8dfc4}.sanityWarn{background:#fff8e8;border-color:#ead09a}
+  .autoFresh{display:inline-block;border:1px solid #cbd8ee;background:#f6f9ff;border-radius:999px;padding:2px 7px;font-size:11px}
 </style>
 </head>
 <body>
 <nav class="homeNav" aria-label="Observant Drive"><a href="https://observantdrive.com/">← ObservantDrive.com</a></nav>
-<h1>FLEX v5.2.41 — Geometric Measurement Platform</h1>
+<h1>FLEX v5.2.42 — Geometric Measurement Platform (BU sanity + review overlays)</h1>
 <div class="small"><b>Measure first. Compare second. Interpret last.</b> FLEX builds a cross-sectional measurement record, then re-reads that same record through explicit geometric lenses. Raw measurements remain separate from fitted scaffolds, reciprocal tests, and optional reference libraries.</div>
 <div class="platformFrame small">
   <b>Platform hierarchy.</b> FLEX distinguishes what was measured, what was derived, and what is being interpreted.
@@ -303,13 +311,12 @@ No internet, no uploads. All computation stays in your browser.
     <div class="small" style="margin-top:8px">
       This tab is intentionally lightweight. The fixed-center/sphere reference lens is now a normal toggle in the main analysis controls; deeper stable-view optimization remains optional so no hidden automatic search changes the active result.
     </div>
-    <div class="kv" style="margin-top:8px">
-      <span class="pill">future priority: reciprocity</span>
-      <span class="pill">future priority: XYZ cooperation</span>
-      <span class="pill">future priority: mirror-phase events</span>
-      <span class="pill">future action: Use This View</span>
-      <span class="pill">future mode: locked XYZ / floating fulcrum</span>
+    <div class="expToolGrid">
+      <div class="expTool"><h3>Automatic downstream freshness</h3><label class="small"><input id="autoRefreshDownstream" type="checkbox" checked/> refresh all downstream lenses after every completed compute</label><div id="downstreamFreshState" class="small" style="margin-top:6px">Waiting for a computed record.</div></div>
+      <div class="expTool"><h3>3D relationship overlay</h3><label class="small"><input id="overlayBandShelves" type="checkbox"/> band shelves</label><br/><label class="small"><input id="overlayTransitions" type="checkbox"/> transition markers</label><br/><label class="small"><input id="overlayReciprocalPairs" type="checkbox"/> reciprocal pair arcs</label><br/><label class="small"><input id="overlayScaffoldFoot" type="checkbox"/> scaffold ↔ foot sanity</label></div>
+      <div class="expTool"><h3>Safe sharing</h3><button id="exportInteractiveReview" disabled>Export Interactive Review HTML</button><div class="small" style="margin-top:6px">Computed results and reduced display geometry only. Analysis functions and full STL are omitted.</div></div>
     </div>
+    <div class="kv" style="margin-top:8px"><span class="pill">experimental: BU independence scoring</span><span class="pill">experimental: scaffold/landmark lock</span><span class="pill">experimental: reciprocal overlay</span><span class="pill">computed-results review export</span></div>
   </div>
 </div>
 
@@ -548,7 +555,7 @@ No internet, no uploads. All computation stays in your browser.
         <button id="resetView" disabled>Reset View</button>
       </div>
     </div>
-    <div class="glWrap"><canvas id="glCanvas" style="height:360px" width="1000" height="360"></canvas><canvas id="ghostCanvas" width="1000" height="360"></canvas><canvas id="axisCompass" width="208" height="208" aria-label="Rotating XYZ orientation compass"></canvas></div>
+    <div class="glWrap"><canvas id="glCanvas" style="height:360px" width="1000" height="360"></canvas><canvas id="ghostCanvas" width="1000" height="360"></canvas><canvas id="analysisOverlay" width="1000" height="360"></canvas><canvas id="axisCompass" width="208" height="208" aria-label="Rotating XYZ orientation compass"></canvas></div>
     <div class="sliderRow">
       <label class="small"><b>Slice height</b> (bottom→top): <span id="sliceLabel">—</span></label>
       <input id="sliceZ" type="range" min="0" max="1000" value="0" disabled/>
@@ -739,11 +746,18 @@ No internet, no uploads. All computation stays in your browser.
     <table id="bandsTbl">
       <thead>
         <tr>
-          <th>#</th><th>Height start</th><th>Height end</th><th>Span</th><th>State</th><th>Snapped radius</th><th>Raw median radial distance</th><th>Snap ratio → next</th><th>Raw ratio → next</th><th>Raw−Snap ratio Δ</th><th>Snap dir</th><th>Raw dir</th><th>Recip product</th><th>Mirror pair</th><th>Median |Δwidth|</th>
+          <th>#</th><th>Height start</th><th>Height end</th><th>Span</th><th>State</th><th title="Representative scaffold radius assigned to this band (the fitted shelf), not the measured radius.">Scaffold radius (band shelf)</th><th title="Median of the measured slice radii within this band.">Measured band median radius</th><th title="Scaffold radius of the next band divided by this band’s scaffold radius.">Scaffold ratio → next</th><th title="Measured median radius of the next band divided by this band’s measured median radius.">Measured ratio → next</th><th title="Measured next-band ratio minus scaffold next-band ratio. This is a ratio difference, not a distance.">Measured−scaffold ratio Δ</th><th>Scaffold direction</th><th>Measured direction</th><th title="Product of the measured ratio entering this band and the measured ratio leaving it. Values near 1 indicate local two-transition cancellation.">Local 2-transition ratio product</th><th title="Mirrored band-to-band transitions paired around the widest region. Parentheses report signed log-ratio closure; values near 0 indicate closer reciprocal closure.">Mirrored transitions (log closure)</th><th title="Within this band, the median absolute radial distance between each measured slice radius and its assigned scaffold radius.">Median |measured radius − scaffold radius|</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
+    <div class="small" style="margin-top:8px">
+      <b>Band-table definitions:</b>
+      “Scaffold radius” is the fitted shelf assigned to the band; “measured band median radius” is the median of the measured slice radii in that band.
+      “Local 2-transition ratio product” multiplies the measured transition entering a band by the measured transition leaving it.
+      “Mirrored transitions” compares band-to-band transformations paired around the widest region; the value in parentheses is signed log-ratio closure, where 0 is ideal reciprocal closure.
+      “Median |measured radius − scaffold radius|” is a within-band scaffold-fit distance, not slice-to-slice drift and not a ratio.
+    </div>
   </div>
 
   <div class="card soft" style="max-height:360px;overflow:auto">
@@ -5328,6 +5342,7 @@ function renderCards(runs){
     if (exportReportHTMLBtn) exportReportHTMLBtn.disabled = !runs.some(r=>r.res);
     if (saveFlexSessionBtn) saveFlexSessionBtn.disabled = !runs.some(r=>r.res);
     if (exportResultsPackageBtn) exportResultsPackageBtn.disabled = !runs.some(r=>r.res);
+    const eir=document.getElementById("exportInteractiveReview"); if(eir) eir.disabled=!runs.some(r=>r.res);
 
     const anyActive = !!getActiveRun() && !!getActiveRun().res;
     if (realHeightInput) realHeightInput.disabled = !anyActive;
@@ -6076,14 +6091,8 @@ function renderCards(runs){
     exportConstJSONBtn.disabled = false;
     exportConstPNGBtn.disabled = false;
 
-    showActive();
-    const analyzedRuns = runs.filter(r=>r.res);
-    drawCompare(analyzedRuns.map(r=>({name:r.name, res:r.res, color:r.color, isActive:r.id===activeId})));
-    drawMoneyView(analyzedRuns);
-    drawScaffoldViews(analyzedRuns);
-    drawMeridianSweep();
-    renderCards(analyzedRuns);
-    updateUI();
+    if(document.getElementById("autoRefreshDownstream")?.checked !== false) refreshAllDownstream("analysis complete");
+    else { showActive(); updateUI(); }
   });
 
 
@@ -8837,7 +8846,9 @@ if (pointCountGL===0 && triCountGL===0){
     const maxWidth = widths.length ? Math.max(...widths) : (r.length ? Math.max(...r.filter(isFinite)) : NaN);
     const minZ = z.length ? Math.min(...z.filter(isFinite)) : (zs.length ? Math.min(...zs) : 0);
     const maxZ = z.length ? Math.max(...z.filter(isFinite)) : (zs.length ? Math.max(...zs) : 1);
-    const height = isFinite(maxZ-minZ) && maxZ>minZ ? maxZ-minZ : 1;
+    const normalizedHeight = isFinite(maxZ-minZ) && maxZ>minZ ? maxZ-minZ : 1;
+    const physicalHeight = axisSpanFromBBox(res?.bbox, res?.axis || "z");
+    const height = isFinite(physicalHeight) && physicalHeight>0 ? physicalHeight : normalizedHeight;
     let bellyBand = 0, bellyWidth = maxWidth;
     bands.forEach((b,i)=>{ const w=isFinite(b.rawMedianWidth)?b.rawMedianWidth:b.rHat; if(isFinite(w) && (!isFinite(bellyWidth) || w>=bellyWidth)){ bellyWidth=w; bellyBand=i; } });
     const bellyZ = bands[bellyBand] ? ((bands[bellyBand].z0 + bands[bellyBand].z1)/2) : (minZ + height/2);
@@ -8854,21 +8865,21 @@ if (pointCountGL===0 && triCountGL===0){
     }
     function bandWidth(b){ return b ? (isFinite(b.rawMedianWidth)?b.rawMedianWidth:b.rHat) : NaN; }
     add("Total height", lm.height, "measured span", "span");
-    add("Maximum width", lm.maxWidth, "measured envelope", "width");
-    add("Belly diameter", lm.bellyWidth, "widest band", "width");
-    if(lm.topBand) add("Lip / top width", bandWidth(lm.topBand), "top band", "width");
+    add("Maximum radial extent", lm.maxWidth, "measured envelope", "radius");
+    add("Belly median radius", lm.bellyWidth, "widest band", "radius");
+    if(lm.topBand) add("Lip / top median radius", bandWidth(lm.topBand), "top band", "radius");
     if(bands.length>2){
       const neck = bands.slice(Math.max(0,bands.length-4)).reduce((best,b)=>{
         const w=bandWidth(b); const bw=best?bandWidth(best):Infinity; return w<bw?b:best;
       }, null);
-      if(neck) add("Neck diameter", bandWidth(neck), "narrow upper band", "width");
+      if(neck) add("Neck median radius", bandWidth(neck), "narrow upper band", "radius");
     }
-    if(lm.baseBand) add("Foot / base width", bandWidth(lm.baseBand), "base band", "width");
+    if(lm.baseBand) add("Foot / base median radius", bandWidth(lm.baseBand), "base band", "radius");
     add("Centroid to lip", Math.abs(lm.maxZ - (lm.bellyZ || (lm.minZ+lm.height/2))), "landmark distance", "distance");
     add("Centroid to belly", Math.abs((lm.bellyZ || 0) - (lm.minZ + lm.height/2)), "landmark distance", "distance");
     add("Centroid to base", Math.abs((lm.minZ + lm.height/2) - lm.minZ), "landmark distance", "distance");
     if(res.texture) add("Mean radius", res.texture.mean || res.texture.median, "radius summary", "radius");
-    add("Scaffold width", res.c || (bands[0] && bands[0].rHat), "derived scaffold scale", "derived");
+    add("Scaffold radial scale", res.c || (bands[0] && bands[0].rHat), "derived scaffold scale", "derived");
     if(res.k) add("Scaffold step", res.k, "derived fit", "derived");
     const manual = parseFloat(document.getElementById("manualBUInput")?.value || "");
     add("User-entered value", manual, "manual downstream value", "manual");
@@ -8887,7 +8898,7 @@ if (pointCountGL===0 && triCountGL===0){
         if(!g.sources.includes(v.source)) g.sources.push(v.source);
         g.kinds.add(v.kind);
         // Prefer a readable physical landmark name as the display label.
-        const priority = {"Maximum width":1,"Belly diameter":2,"Foot / base width":3,"Lip / top width":4,"Neck diameter":5};
+        const priority = {"Maximum radial extent":1,"Belly median radius":2,"Foot / base median radius":3,"Lip / top median radius":4,"Neck median radius":5};
         if((priority[v.name]||99) < (priority[g.name]||99)){
           g.aliases.push({name:g.name, source:g.source, value:g.value, kind:g.kind});
           g.name=v.name; g.source=v.source; g.value=v.value; g.kind=v.kind;
@@ -8935,7 +8946,7 @@ if (pointCountGL===0 && triCountGL===0){
     const rows=[];
     function add(label,value){ if(isFinite(value) && isFinite(bu) && bu>0) rows.push({label,value,n:value/bu, near:nearestSimpleValue(value/bu)}); }
     add("height", lm.height);
-    add("max width", lm.maxWidth);
+    add("max radial extent", lm.maxWidth);
     add("belly", lm.bellyWidth);
     add("foot/base", bw(lm.baseBand));
     add("lip/top", bw(lm.topBand));
@@ -8944,7 +8955,7 @@ if (pointCountGL===0 && triCountGL===0){
       add("neck", bw(neck));
     }
     add("mean radius", res.texture?.mean || res.texture?.median);
-    add("scaffold width", res.c || (bands[0] && bands[0].rHat));
+    add("scaffold radial scale", res.c || (bands[0] && bands[0].rHat));
     add("scaffold step", res.k);
     return rows;
   }
@@ -8954,7 +8965,14 @@ if (pointCountGL===0 && triCountGL===0){
     const widths = bands.map(b=>isFinite(b.rawMedianWidth)?b.rawMedianWidth:b.rHat).filter(isFinite);
     const normalized = widths.map(w=>w/cand.value).filter(x=>isFinite(x)&&x>0);
     const normLandmarks = normalizedLandmarkValues(res, cand.value);
-    const landmarkSimplicity = normLandmarks.length ? normLandmarks.reduce((a,row)=>a+Math.max(0,1-(row.near?.logErr||9)/0.045),0)/normLandmarks.length : 0;
+    const independentLandmarks = normLandmarks.filter(row=>{
+      const lab=(row.label||"").toLowerCase();
+      if(lab.includes("scaffold")) return false;
+      if(cand.kind==="span" && lab==="height") return false;
+      if(cand.kind==="radius" && ((cand.name||"").toLowerCase().includes("foot") ? lab==="foot/base" : false)) return false;
+      return true;
+    });
+    const landmarkSimplicity = independentLandmarks.length ? independentLandmarks.reduce((a,row)=>a+Math.max(0,1-(row.near?.logErr||9)/0.045),0)/independentLandmarks.length : 0;
     const bandSimplicity = normalized.length ? normalized.reduce((a,x)=>a+Math.max(0,1-(nearestSimpleValue(x)?.logErr||9)/0.045),0)/normalized.length : 0;
     const clusterMap = new Map();
     normLandmarks.forEach(row=>{ if(row.near && row.near.logErr<0.035) clusterMap.set(row.near.name,(clusterMap.get(row.near.name)||0)+1); });
@@ -8971,6 +8989,22 @@ if (pointCountGL===0 && triCountGL===0){
     // evidence is shown as context, but weighted lightly.
     const overall = clamp(landmarkSimplicity*.34 + bandSimplicity*.18 + clusterReuse*.12 + roundScore*.08 + rawSupport*.08 + recipScore*.08 + xyzScore*.06 + rawSnap*.06,0,1);
     return {...cand, normalized:normLandmarks, landmarkSimplicity, bandSimplicity, clusterReuse, roundScore, roundness, rawSupport, recipScore, xyzScore, rawSnap, overall};
+  }
+
+  function buScaffoldLandmarkSanity(res){
+    const bands=res?.bands||[]; if(!bands.length) return null;
+    const scaffold=Number(res.c || bands[0]?.rHat);
+    const measured=bands.map((b,i)=>({i,label:i===0?"foot/base":`band ${i+1}`,value:Number(isFinite(b.rawMedianWidth)?b.rawMedianWidth:b.rHat)})).filter(x=>isFinite(x.value)&&x.value>0);
+    if(!isFinite(scaffold)||!measured.length) return null;
+    const ranked=measured.map(x=>({...x,abs:Math.abs(x.value-scaffold),pct:Math.abs(x.value/scaffold-1),log:Math.abs(Math.log(x.value/scaffold))})).sort((a,b)=>a.log-b.log);
+    const foot=ranked.find(x=>x.i===0);
+    return {scaffold,nearest:ranked[0],foot,ranked};
+  }
+  function sanityHTML(res){
+    const s=buScaffoldLandmarkSanity(res); if(!s) return "";
+    const footRank=s.ranked.findIndex(x=>x.i===0)+1;
+    const cls=s.foot?.pct<=0.005?"sanityHot":s.foot?.pct<=0.02?"sanityWarn":"";
+    return `<div class="buRecipe ${cls}"><b>Experimental scaffold ↔ landmark sanity:</b> scaffold radial scale ${safeNum(s.scaffold,5)}. Closest independently measured shelf: <b>${escapeHtml(s.nearest.label)}</b> ${safeNum(s.nearest.value,5)} · Δ ${safeNum(s.nearest.abs,5)} · ${safeNum(s.nearest.pct*100,2)}% · |log ratio| ${safeNum(s.nearest.log,5)}. Foot/base rank ${footRank}/${s.ranked.length}${s.foot?` · foot Δ ${safeNum(s.foot.abs,5)} · ${safeNum(s.foot.pct*100,2)}%`:""}. Candidate self-normalization is excluded from independent-landmark simplicity.</div>`;
   }
   function coordinateLensRows(pack){
     const {res,xc,rec}=pack;
@@ -9099,6 +9133,7 @@ if (pointCountGL===0 && triCountGL===0){
           <b>How to use:</b> pick any BU candidate from the selector above or click <b>use</b> in the table. FLEX then rewrites the same landmarks in that unit so you can see whether they become simple, fractional, whole-number, root-like, or messy.
         </div>
         <p><b>Current read:</b> ${topRead}</p>
+        ${sanityHTML(pack.res)}
         <div class="lensMetricGrid">
           ${metricCard("active BU", top?.name || "—", top?.overall || 0)}
           ${metricCard("BU value", top ? safeNum(top.value,5) : "—")}
@@ -9364,7 +9399,15 @@ if (pointCountGL===0 && triCountGL===0){
     const rawPairs = dg.reciprocalPairs.filter(p=>p.lens==="raw").slice(0,12).map(p=>`<tr><td>${p.a+1}↔${p.b+1}</td><td>${safeNum(p.ra,4)}</td><td>${safeNum(p.rb,4)}</td><td>${safeNum(p.product,4)}</td><td>${p.logClosure>=0?"+":""}${safeNum(p.logClosure,4)}</td></tr>`).join("");
     const html = `<!doctype html><html><head><meta charset="utf-8"><title>FLEX Report — ${escapeHtml(run.name)}</title><style>
       body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:32px;color:#111;line-height:1.35} h1{margin:0 0 4px} h2{margin:0 0 10px} h3{margin:14px 0 6px}.muted{color:#666}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px}.graphgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px}.graphgrid figure{margin:0;border:1px solid #eee;border-radius:14px;padding:10px;break-inside:avoid}.graphgrid h3{font-size:15px;margin:0 0 8px}.card{border:1px solid #ddd;border-radius:14px;padding:14px;margin:16px 0;break-inside:avoid}.kv{display:grid;grid-template-columns:minmax(140px,190px) 1fr;gap:6px 12px;font-size:14px}.kv b{color:#666} img{max-width:100%;height:auto;border:1px solid #eee;border-radius:12px} table{display:block;width:100%;max-width:100%;overflow-x:auto;border-collapse:collapse;font-size:12px;white-space:nowrap}td,th{border-bottom:1px solid #eee;padding:5px 6px;text-align:left;vertical-align:top}.grammarBox{overflow:auto;break-inside:avoid}.hot{background:#f2fff2}.warn{background:#fff9e8}.loose{background:#fff4f4}.reportChip{display:inline-block;border:1px solid #ddd;border-radius:999px;padding:3px 8px;margin:2px;background:#fff;font-size:12px} @media print{.pagebreak{break-before:page} body{margin:14mm}.card,.graphgrid figure{break-inside:avoid}.graphgrid{grid-template-columns:1fr 1fr} table{display:table;white-space:normal;overflow:visible;font-size:10.5px}}
-      </style></head><body>
+      
+  /* v5.2.42 experimental BU sanity + viewer relationship overlay */
+  #analysisOverlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;background:transparent;border:0}
+  .expToolGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin-top:10px}
+  .expTool{border:1px solid #e3e8f0;background:#fbfdff;border-radius:12px;padding:10px}
+  .expTool h3{font-size:13px;margin:0 0 6px}
+  .sanityHot{background:#eefaf2;border-color:#b8dfc4}.sanityWarn{background:#fff8e8;border-color:#ead09a}
+  .autoFresh{display:inline-block;border:1px solid #cbd8ee;background:#f6f9ff;border-radius:999px;padding:2px 7px;font-size:11px}
+</style></head><body>
       <h1>FLEX 3D Report Card</h1><div class="muted">Generated ${new Date().toLocaleString()} · ${escapeHtml(run.name)}</div>
       <div class="card"><h2>Object + analysis</h2><div class="kv">
       <b>file</b><span>${escapeHtml(run.name)}</span><b>vertices</b><span>${verts.toLocaleString()}</span><b>triangles</b><span>${tri.toLocaleString()}</span><b>mode</b><span>${escapeHtml(res.measure?.mode||"vertex")} / ${escapeHtml(res.fit?.mode||"fixed")} / ${escapeHtml(getMathSpeedProfile())}</span><b>axis</b><span>${escapeHtml(String(res.axis||"z").toUpperCase())}</span><b>slices used</b><span>${res.N_slices_used}</span><b>bands</b><span>${(res.bands||[]).length}</span><b>real scale</b><span>${cal.enabled ? `${cal.height.toFixed(3)} ${cal.unit}; 1 model unit = ${cal.scale.toFixed(5)} ${cal.unit}` : "not calibrated"}</span></div></div>
@@ -9424,6 +9467,35 @@ if (pointCountGL===0 && triCountGL===0){
       }
     };
   }
+
+  function refreshAllDownstream(reason="compute complete"){
+    try{
+      showActive();
+      const analyzedRuns=runs.filter(r=>r.res);
+      drawCompare(analyzedRuns.map(r=>({name:r.name,res:r.res,color:r.color,isActive:r.id===activeId})));
+      drawMoneyView(analyzedRuns); drawScaffoldViews(analyzedRuns); drawMeridianSweep(); renderCards(analyzedRuns); renderPlatformLensReport(); drawAnalysisOverlay(); updateUI();
+      const st=document.getElementById("downstreamFreshState"); if(st) st.innerHTML=`<span class="autoFresh">Current</span> ${escapeHtml(reason)} · ${new Date().toLocaleTimeString()}`;
+    }catch(e){ console.warn("downstream refresh",e); }
+  }
+  function drawAnalysisOverlay(){
+    const cv=document.getElementById("analysisOverlay"); if(!cv) return; const ctx=cv.getContext("2d");
+    const rect=cv.getBoundingClientRect(); if(rect.width>0 && (cv.width!==Math.round(rect.width)||cv.height!==Math.round(rect.height))){cv.width=Math.round(rect.width);cv.height=Math.round(rect.height)}
+    ctx.clearRect(0,0,cv.width,cv.height); const run=getActiveRun(); const res=run?.res; if(!res) return;
+    const bands=res.bands||[]; const onBands=document.getElementById("overlayBandShelves")?.checked; const onTrans=document.getElementById("overlayTransitions")?.checked; const onRec=document.getElementById("overlayReciprocalPairs")?.checked; const onSF=document.getElementById("overlayScaffoldFoot")?.checked;
+    if(!(onBands||onTrans||onRec||onSF)) return;
+    const left=18,right=cv.width-18, top=18,bottom=cv.height-18, xRail=right-34; ctx.font="11px system-ui"; ctx.lineWidth=1;
+    const yOf=z=>bottom-clamp(Number(z),0,1)*(bottom-top);
+    if(onBands){ctx.strokeStyle="rgba(30,90,190,.55)";ctx.fillStyle="rgba(20,60,120,.8)";bands.forEach((b,i)=>{const y=yOf((b.z0+b.z1)/2);ctx.beginPath();ctx.moveTo(xRail-18,y);ctx.lineTo(xRail+18,y);ctx.stroke();ctx.fillText(String(i+1),xRail+21,y+4)})}
+    if(onTrans){ctx.strokeStyle="rgba(190,80,20,.7)";bands.slice(0,-1).forEach(b=>{const y=yOf(b.z1);ctx.beginPath();ctx.moveTo(xRail-8,y);ctx.lineTo(xRail+8,y);ctx.stroke()})}
+    if(onRec){const rec=computeReciprocalTraversal(res); const pairs=rec?.mirrorPairs||rec?.pairs||[];ctx.strokeStyle="rgba(125,40,160,.55)";pairs.slice(0,12).forEach(p=>{const a=Number(p.i??p.leftIndex??p.a??0),b=Number(p.j??p.rightIndex??p.b??0);if(!bands[a]||!bands[b])return;const y1=yOf((bands[a].z0+bands[a].z1)/2),y2=yOf((bands[b].z0+bands[b].z1)/2);ctx.beginPath();ctx.moveTo(xRail-20,y1);ctx.quadraticCurveTo(xRail-70,(y1+y2)/2,xRail-20,y2);ctx.stroke()})}
+    if(onSF){const s=buScaffoldLandmarkSanity(res);if(s){ctx.fillStyle="rgba(0,100,60,.88)";ctx.fillText(`scaffold↔foot Δ ${safeNum(s.foot?.pct*100,2)}%`,left,top+12)}}
+  }
+  function exportInteractiveReviewHTML(){
+    const run=getActiveRun(); if(!run?.res||!run?.parsed?.vertices) return;
+    const pkg=slimRunForResultsPackage(run); const data=JSON.stringify(pkg).replace(/</g,"\\u003c");
+    const html=`<!doctype html><meta charset="utf-8"><title>FLEX Interactive Review — ${escapeHtml(run.name)}</title><style>body{font:14px system-ui;margin:16px;color:#111}canvas{width:100%;height:68vh;border:1px solid #ddd;border-radius:12px}button,label{margin:4px}.note{color:#666}.row{display:flex;gap:10px;flex-wrap:wrap}.card{border:1px solid #ddd;border-radius:12px;padding:10px;margin-top:10px}</style><h1>FLEX Interactive Review</h1><p class="note">Computed results only. No slicing, fitting, optimization, or full analysis engine is included.</p><div class="row"><button id="reset">Reset view</button><label><input id="bands" type="checkbox" checked> bands</label><label><input id="recip" type="checkbox" checked> reciprocal links</label><label><input id="raw" type="checkbox"> raw points</label></div><canvas id="c" width="1200" height="700"></canvas><div class="card" id="info"></div><script>const D=${data};const c=document.getElementById('c'),x=c.getContext('2d'),P=D.display.points.positions,R=D.res;let yaw=.45,pitch=-.2,zoom=1,drag=false,lx=0,ly=0;function draw(){x.clearRect(0,0,c.width,c.height);x.save();x.translate(c.width/2,c.height/2);const pts=[];for(let i=0;i<P.length;i+=3){let X=P[i],Y=P[i+1],Z=P[i+2];const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);let a=X*cy-Z*sy,b=X*sy+Z*cy;let yy=Y*cp-b*sp,zz=Y*sp+b*cp;pts.push([a,yy,zz,Y])}let m=1;for(const q of pts)m=Math.max(m,Math.abs(q[0]),Math.abs(q[1]));const sc=zoom*Math.min(c.width,c.height)*.42/m;x.fillStyle='#555';for(let i=0;i<pts.length;i+=document.getElementById('raw').checked?1:3){const q=pts[i];x.fillRect(q[0]*sc,-q[1]*sc,1.2,1.2)}if(document.getElementById('bands').checked&&R.bands){x.strokeStyle='rgba(20,90,190,.65)';x.fillStyle='#145';R.bands.forEach((b,i)=>{const yy=(.5-((b.z0+b.z1)/2))*c.height*.82;x.beginPath();x.moveTo(c.width*.34-c.width/2,yy);x.lineTo(c.width*.46-c.width/2,yy);x.stroke();x.fillText(i+1,c.width*.47-c.width/2,yy+4)})}x.restore()}c.onmousedown=e=>{drag=true;lx=e.clientX;ly=e.clientY};onmouseup=()=>drag=false;onmousemove=e=>{if(!drag)return;yaw+=(e.clientX-lx)*.01;pitch+=(e.clientY-ly)*.01;lx=e.clientX;ly=e.clientY;draw()};c.onwheel=e=>{e.preventDefault();zoom*=e.deltaY<0?1.1:.9;draw()};document.querySelectorAll('input').forEach(e=>e.onchange=draw);reset.onclick=()=>{yaw=.45;pitch=-.2;zoom=1;draw()};info.innerHTML='<b>'+D.name+'</b><br>bands '+(R.bands?.length||0)+' · scaffold radial scale '+Number(R.c||0).toFixed(5)+' · scaffold step '+Number(R.k||0).toFixed(6);draw();<\/script>`;
+    downloadBlob(new Blob([html],{type:"text/html"}),`${baseName(run.name)}_FLEX_interactive_review_${nowStamp()}.html`);
+  }
   function exportResultsPackage(){
     const analyzed = runs.filter(r=>r.res && r.parsed && r.parsed.vertices);
     if(!analyzed.length) return;
@@ -9431,7 +9503,7 @@ if (pointCountGL===0 && triCountGL===0){
     const active = getActiveRun();
     const payload = {
       schema: "observant-flex-results-package-v1",
-      app: "FLEX v5.2.24 theater/results package",
+      app: "FLEX v5.2.42 BU sanity/review overlays",
       savedAt: new Date().toISOString(),
       description: "Precomputed FLEX results package for downstream viewing. It stores computed observations, reports, XYZ/reciprocal fields when available, and a reduced display point cloud. It does not contain the computation engine or full STL mesh.",
       activeId,
@@ -9476,7 +9548,7 @@ if (pointCountGL===0 && triCountGL===0){
     if(!analyzed.length) return;
     const payload = {
       schema: "observant-flex-session-v1",
-      app: "FLEX v5.2.24 theater/results package",
+      app: "FLEX v5.2.42 BU sanity/review overlays",
       savedAt: new Date().toISOString(),
       activeId,
       settings: {
@@ -9550,6 +9622,10 @@ if (pointCountGL===0 && triCountGL===0){
   if(exportReportHTMLBtn) exportReportHTMLBtn.addEventListener("click", exportFlexReportHTML);
   if(saveFlexSessionBtn) saveFlexSessionBtn.addEventListener("click", saveFlexSession);
   if(exportResultsPackageBtn) exportResultsPackageBtn.addEventListener("click", exportResultsPackage);
+  const exportInteractiveReviewBtn=document.getElementById("exportInteractiveReview");
+  if(exportInteractiveReviewBtn) exportInteractiveReviewBtn.addEventListener("click", exportInteractiveReviewHTML);
+  ["overlayBandShelves","overlayTransitions","overlayReciprocalPairs","overlayScaffoldFoot"].forEach(id=>document.getElementById(id)?.addEventListener("change",drawAnalysisOverlay));
+  window.addEventListener("resize",()=>setTimeout(drawAnalysisOverlay,50));
   if(loadFlexSessionBtn) loadFlexSessionBtn.addEventListener("click", ()=> flexSessionFileInput && flexSessionFileInput.click());
   if(flexSessionFileInput) flexSessionFileInput.addEventListener("change", async ()=>{
     const file = flexSessionFileInput.files && flexSessionFileInput.files[0];
@@ -9910,7 +9986,15 @@ if (pointCountGL===0 && triCountGL===0){
     const title = run ? `FLEX Full Dossier — ${escapeHtml(run.name)}` : 'FLEX Full Dossier';
     return `<!doctype html><html><head><meta charset="utf-8"><title>${title}</title><style>
       body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:28px;color:#111;line-height:1.36}.muted,.tiny{color:#666}.card{border:1px solid #ddd;border-radius:14px;padding:14px;margin:16px 0;break-inside:avoid}.dossierGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px}figure{margin:0;border:1px solid #eee;border-radius:12px;padding:10px;break-inside:avoid}img{max-width:100%;height:auto;border:1px solid #eee;border-radius:10px}table{width:100%;border-collapse:collapse;font-size:11px;break-inside:auto}td,th{border-bottom:1px solid #eee;padding:5px 6px;text-align:left;vertical-align:top}.reportChip{display:inline-block;border:1px solid #ddd;border-radius:999px;padding:3px 8px;margin:2px;background:#fff;font-size:12px}.grammarBox{border:1px solid #eee;border-radius:10px;padding:8px;margin:8px 0;break-inside:avoid;overflow:auto}.reportScroll{overflow:visible}.grammarTbl{font-size:10.5px}@media print{body{margin:12mm}.card,figure,.grammarBox{break-inside:avoid}.dossierGrid{grid-template-columns:1fr 1fr}}
-      </style></head><body>${buildDossierHTML()}</body></html>`;
+      
+  /* v5.2.42 experimental BU sanity + viewer relationship overlay */
+  #analysisOverlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;background:transparent;border:0}
+  .expToolGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin-top:10px}
+  .expTool{border:1px solid #e3e8f0;background:#fbfdff;border-radius:12px;padding:10px}
+  .expTool h3{font-size:13px;margin:0 0 6px}
+  .sanityHot{background:#eefaf2;border-color:#b8dfc4}.sanityWarn{background:#fff8e8;border-color:#ead09a}
+  .autoFresh{display:inline-block;border:1px solid #cbd8ee;background:#f6f9ff;border-radius:999px;padding:2px 7px;font-size:11px}
+</style></head><body>${buildDossierHTML()}</body></html>`;
   }
   ["coordinateLensSelect","manualBUInput","refreshPlatformLens","activeBUSelect"].forEach(id=>{
     const el=document.getElementById(id);
@@ -9981,6 +10065,14 @@ if (pointCountGL===0 && triCountGL===0){
 <style>
   .audit-pill{padding:2px 8px;border-radius:999px;border:1px solid #ddd;font-size:12px;background:#fff}
   .audit-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+
+  /* v5.2.42 experimental BU sanity + viewer relationship overlay */
+  #analysisOverlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;background:transparent;border:0}
+  .expToolGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin-top:10px}
+  .expTool{border:1px solid #e3e8f0;background:#fbfdff;border-radius:12px;padding:10px}
+  .expTool h3{font-size:13px;margin:0 0 6px}
+  .sanityHot{background:#eefaf2;border-color:#b8dfc4}.sanityWarn{background:#fff8e8;border-color:#ead09a}
+  .autoFresh{display:inline-block;border:1px solid #cbd8ee;background:#f6f9ff;border-radius:999px;padding:2px 7px;font-size:11px}
 </style>
 
 <div class="card soft" style="margin-top:10px">
